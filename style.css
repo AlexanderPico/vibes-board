@@ -159,12 +159,10 @@ button {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
     overflow: hidden;
-    background-image: var(--wood-url);
-    background-size: cover;
     border: 3px solid var(--wood-dark);
     padding: 1rem;
-    transform-style: preserve-3d;
-    transform-origin: center bottom;
+    transform: none; /* Reset any transform to avoid tilting */
+    /* Background image is set by cloning from the tile */
 }
 
 /* Add wood grain effect to widgets */
@@ -272,8 +270,8 @@ button {
     text-align: center;
     font-size: 1rem;
     box-shadow: 
-        0 3px 6px rgba(0, 0, 0, 0.3),
-        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        0 8px 16px rgba(0, 0, 0, 0.4), /* Match widget shadow */
+        inset 0 1px 3px rgba(255, 255, 255, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 2px solid var(--wood-dark);
     position: relative;
@@ -284,8 +282,10 @@ button {
     justify-content: center;
     background-image: var(--wood-url);
     background-size: cover;
+    background-position: center;
     transform-style: preserve-3d;
-    transform-origin: center bottom; /* Set origin to bottom for a natural lift */
+    transform-origin: center bottom;
+    overflow: hidden; /* Match widget overflow */
 }
 
 /* Add subtle edge to create tile effect */
@@ -315,7 +315,7 @@ button {
     bottom: 0;
     background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.08' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.5; /* Consistent opacity */
     border-radius: 6px;
     mix-blend-mode: overlay;
 }
@@ -338,7 +338,8 @@ button {
         0 -1px 1px rgba(0, 0, 0, 0.8),
         0 1px 0 rgba(255, 255, 255, 0.2);
     letter-spacing: 1px;
-    transform: translateZ(2px); /* Subtle lift for the text */
+    position: relative;
+    transform: translateZ(2px); /* Subtle lift */
 }
 
 /* Add a subtle wood grain texture to the carved text */
@@ -357,17 +358,20 @@ button {
 }
 
 .tile:hover {
-    /* Tilt up and to the left on hover */
-    transform: perspective(800px) rotateX(15deg) rotateY(-5deg) translateZ(10px);
+    /* Remove the tilting effect on hover - only show a subtle lift */
+    transform: translateY(-2px);
     box-shadow: 
-        10px 15px 20px rgba(0, 0, 0, 0.4),
+        0 10px 20px rgba(0, 0, 0, 0.4),
         inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .tile:active {
     cursor: grabbing;
-    transform: perspective(800px) rotateX(5deg) rotateY(-2deg) translateZ(5px);
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+    /* Apply the same tilt effect as widgets when active */
+    transform: perspective(800px) rotateX(15deg) rotateY(-5deg) translateZ(10px);
+    box-shadow: 
+        10px 15px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 /* Animation for tiles being dragged */
@@ -404,13 +408,23 @@ button {
 /* Make widgets appear tilted when dragging or lifting from slots */
 .widget:active, .widget.dragging {
     cursor: grabbing;
-    transform: perspective(800px) rotateX(15deg) rotateY(-5deg) translateZ(10px);
+    transform: perspective(800px) rotateX(15deg) rotateY(-5deg) translateZ(10px) !important;
     box-shadow: 
         10px 15px 20px rgba(0, 0, 0, 0.4),
         inset 0 1px 2px rgba(255, 255, 255, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    /* Keep the z-index high when dragging to appear above other elements */
+    z-index: 10;
 }
 
+/* Reset widget transform when dragging ends - make this more specific */
+.widget:not(.dragging):not(:active):not(.lifting) {
+    transform: none !important;
+    box-shadow: 
+        0 8px 16px rgba(0, 0, 0, 0.4),
+        inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
 
 /* Animation for receiving a widget */
 .receiving {
@@ -619,4 +633,83 @@ button {
     mix-blend-mode: multiply;
     opacity: .65;
     filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .4));
+}
+
+/* Wood type textures - applied based on data attributes */
+.widget[data-wood="oak"] {
+    border-color: #5d432c;
+}
+
+.widget[data-wood="maple"] {
+    border-color: #bb9b7c;
+}
+
+.widget[data-wood="cherry"] {
+    border-color: #8e443d;
+}
+
+.widget[data-wood="walnut"] {
+    border-color: #4a351f;
+}
+
+.widget[data-wood="beech"] {
+    border-color: #d7bc91;
+}
+
+.widget[data-wood="bamboo"] {
+    border-color: #7d8e6e;
+}
+
+/* Ensure image layers correctly over wood background */
+.widget[data-image], .tile[data-image] {
+    background-blend-mode: normal;
+}
+
+/* Border colors based on wood type - keep these to match wood types */
+.tile[data-wood="oak"], .widget[data-wood="oak"] {
+    border-color: #5d432c;
+}
+
+.tile[data-wood="maple"], .widget[data-wood="maple"] {
+    border-color: #bb9b7c;
+}
+
+.tile[data-wood="cherry"], .widget[data-wood="cherry"] {
+    border-color: #8e443d;
+}
+
+.tile[data-wood="walnut"], .widget[data-wood="walnut"] {
+    border-color: #4a351f;
+}
+
+.tile[data-wood="beech"], .widget[data-wood="beech"] {
+    border-color: #d7bc91;
+}
+
+.tile[data-wood="bamboo"], .widget[data-wood="bamboo"] {
+    border-color: #7d8e6e;
+}
+
+/* Target the specific sunrise icon to match color in the image (black in palette, reddish on board) */
+.tile[data-tile="sunrise"] {
+    --icon-color: black;
+}
+
+.widget[data-tile="sunrise"] {
+    --icon-color: #8e443d;
+}
+
+/* Apply filter based on palette vs board to achieve the different colors */
+.tile.has-svg {
+    filter: brightness(0.8) contrast(1.2);
+}
+
+.widget.has-svg {
+    filter: sepia(0.3) brightness(1.05);
+}
+
+/* Ensure the span label is always on top and readable */
+.tile span, .widget span {
+    z-index: 2;
+    position: relative;
 }

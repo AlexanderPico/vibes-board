@@ -36,6 +36,7 @@
             width: 100%;
             max-width: 160px;
             margin: 0 auto;
+            background: rgba(0, 0, 0, 0.15); /* Lighter background */
         }
         
         .slot[data-slot="1"] {
@@ -49,6 +50,33 @@
         .slot[data-slot="3"] {
             grid-area: slot3;
         }
+        
+        /* Visual consistency between tiles and widgets */
+        .tile, .widget {
+            background-size: cover !important;
+            background-position: center !important;
+        }
+        
+        /* Widget styling to match its original tile */
+        .widget {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            /* Only reset transform when NOT dragging */
+            transition: transform 0.3s ease-out;
+        }
+        
+        /* Allow tilting during drag */
+        .widget.dragging {
+            /* No transform:none here to allow tilting */
+        }
+        
+        /* Ensure the slot's wood type doesn't override the widget's */
+        .slot > .widget {
+            background-image: inherit; /* Use exactly what was cloned */
+        }
     </style>
 </head>
 
@@ -56,10 +84,8 @@
     <!-- Wooden-tile palette -->
     <aside id="palette">
         <h2>Tiles</h2>
-        <div class="tile" data-tile="sunrise">
-            <span>Sunrise</span>
-            <div class="grain"></div>
-        </div>
+        <!-- Tile will be populated from tiles.js using each tile's self-defined wood type -->
+        <div id="palette-tiles"></div>
     </aside>
 
     <!-- Main wooden panel -->

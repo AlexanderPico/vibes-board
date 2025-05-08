@@ -182,7 +182,7 @@ export const utils = {
 document.addEventListener('DOMContentLoaded', () => {
     // DOM refs
     const palette = document.getElementById('palette');
-    const tiles = [...palette.querySelectorAll('.tile')];
+    const paletteContainer = document.getElementById('palette-tiles');
     const slots = [...document.querySelectorAll('.slot')];
 
     // Helper functions
@@ -202,10 +202,79 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 0);
         });
         
-        node.addEventListener('dragend', () => {
+        node.addEventListener('dragend', e => {
+            // Immediately remove the dragging class to end the tilt effect
             node.classList.remove('dragging');
+            
+            // Only affect widgets, not tiles
+            if (node.classList.contains('widget')) {
+                // Force a style reset after a short delay to ensure transitions complete
+                setTimeout(() => {
+                    // Additional safety check to ensure dragging class is gone
+                    node.classList.remove('dragging');
+                    
+                    // Only reset if not in any special state
+                    if (!node.classList.contains('dragging') && !node.classList.contains('lifting')) {
+                        // Clear any inline transform styles that might be lingering
+                        if (node.style.transform && node.style.transform !== 'none') {
+                            node.style.transform = 'none';
+                        }
+                    }
+                }, 50);
+            }
         });
     }
+
+    // Create the palette tiles based on the modules registry
+    function createPaletteTiles() {
+        // Clear existing tiles
+        paletteContainer.innerHTML = '';
+        
+        // For each registered tile type
+        Object.entries(modules).forEach(([key, tileModule]) => {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.dataset.tile = key;
+            
+            // Create the label
+            const label = document.createElement('span');
+            label.textContent = tileModule.label || key;
+            tile.appendChild(label);
+            
+            // Create the grain div
+            const grain = document.createElement('div');
+            grain.className = 'grain';
+            tile.appendChild(grain);
+            
+            // Store wood type in dataset for persistence
+            if (tileModule.wood) {
+                const woodPath = `./assets/wood/${tileModule.wood}.jpg`;
+                tile.dataset.wood = tileModule.wood;
+                // Set background to the module's wood type
+                tile.style.backgroundImage = `url(${woodPath})`;
+                
+                // Apply image if available
+                if (tileModule.image) {
+                    tile.dataset.image = tileModule.image;
+                    // Layer image over wood
+                    tile.style.backgroundImage = `url(${tileModule.image}), url(${woodPath})`;
+                }
+            } else if (tileModule.image) {
+                // Just image, no wood
+                tile.dataset.image = tileModule.image;
+                tile.style.backgroundImage = `url(${tileModule.image})`;
+            }
+            
+            // Make it draggable
+            makeDraggable(tile, key);
+            
+            // Add to palette
+            paletteContainer.appendChild(tile);
+        });
+    }
+
+    // Create initial palette tiles
+    createPaletteTiles();
 
     // Handle dropping a widget onto a slot
     function handleSlotDrop(e, slot) {
@@ -232,8 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Move the widget to the new slot
             slot.appendChild(w);
             
-            // Apply current wood texture
-            applyCurrentWoodTexture([w]);
+            // Ensure dragging class is removed AFTER the widget is moved to new slot
+            setTimeout(() => {
+                w.classList.remove('dragging');
+            }, 10);
             
             const newTile = findTile(type);
             newTile && (newTile.style.display = 'none'); // Hide the tile
@@ -247,25 +318,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!srcTile || !slotIsEmpty(slot)) return;
 
         /* build widget */
-        let widget;
-        // Check if the module has a create method (like sunrise) or is a function
-        if (modules[type] && typeof modules[type].create === 'function') {
-            widget = modules[type].create();
-        } else if (typeof modules[type] === 'function') {
-            widget = modules[type]();
-        } else {
-            console.error(`Tile ${type} is not properly structured`);
-            return;
-        }
+        // For consistency, create a clone to preserve all properties
+        const widget = srcTile.cloneNode(true);
+        widget.classList.remove('tile');
+        widget.classList.add('widget');
+        // No dragging class removal here - will be handled by dragend event
         
+        // Preserve exact background image and wood type
+        widget.style.backgroundImage = srcTile.style.backgroundImage;
         widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        widget.dataset.tile = type;
         makeDraggable(widget, type);
-        
-        // Apply current wood texture 
-        applyCurrentWoodTexture([widget]);
 
-        // Only add background highlight to slot, not animation to widget
+        // Only add background highlight to slot
         slot.classList.add('receiving');
         setTimeout(() => slot.classList.remove('receiving'), 300);
         
@@ -275,6 +339,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Append the widget
         slot.appendChild(widget);
         
+        // Force an immediate reset of transform after appending to ensure no tilt
+        setTimeout(() => {
+            widget.classList.remove('dragging');
+            widget.style.transform = 'none';
+        }, 0);
+        
         srcTile.style.display = 'none'; // Hide the tile completely
         saveLayout();
     }
@@ -283,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyLiftingAnimation(widget, callback) {
         // Add the lifting class to trigger the animation
         widget.classList.add('lifting');
+        widget.classList.remove('dragging'); // Ensure no conflict with dragging
         
         // Remove the widget after animation completes
         widget.addEventListener('animationend', () => {
@@ -298,11 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         localStorage.setItem(`vibes-layout-v1`, JSON.stringify(layout));
     }
-
-    // Make palette tiles draggable
-    tiles.forEach(t => {
-        makeDraggable(t, t.dataset.tile);
-    });
 
     // Setup slots as drop targets
     slots.forEach(slot => {
@@ -370,28 +436,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const tile = findTile(item.type);
         if (!slot || !tile || !slotIsEmpty(slot)) return;
 
-        let widget;
-        // Check if the module has a create method (like sunrise) or is a function
-        if (modules[item.type] && typeof modules[item.type].create === 'function') {
-            widget = modules[item.type].create();
-        } else if (typeof modules[item.type] === 'function') {
-            widget = modules[item.type]();
-        } else {
-            console.error(`Tile ${item.type} is not properly structured`);
-            return;
-        }
+        // Clone tile to preserve all properties including background
+        const widget = tile.cloneNode(true);
+        widget.classList.remove('tile');
+        widget.classList.add('widget');
+        // No dragging class removal here - only needed during active drag operations
         
+        // Keep exact background image from original tile
+        widget.style.backgroundImage = tile.style.backgroundImage;
         widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        widget.dataset.tile = item.type;
         makeDraggable(widget, item.type);
 
         slot.appendChild(widget);
         tile.style.display = 'none'; // Hide the tile completely
     });
 
-    // Apply wood texture to tiles once wood selector is ready
+    // No need to apply wood texture to tiles
     document.addEventListener('woodSelectorReady', () => {
-        applyCurrentWoodTexture(tiles);
+        // Only apply wood to the board
+        const panel = document.getElementById('panel');
+        if (panel) {
+            const woodType = window.getCurrentWoodType ? window.getCurrentWoodType() : 'oak';
+            panel.style.backgroundImage = `url(./assets/wood/${woodType}.jpg)`;
+        }
     });
 });
 
@@ -400,18 +467,16 @@ export const modules = {
     sunrise
 };
 
-// Listen for wood type changes
+// Listen for wood type changes - only apply to board, not tiles
 document.addEventListener('woodTypeChanged', (e) => {
-    // Update all existing widgets with the new wood texture
+    // Update only the panel with the new wood texture
     const woodPath = `./assets/wood/${e.detail.woodType}.jpg`;
-    document.querySelectorAll('.widget').forEach(widget => {
-        widget.style.backgroundImage = `url(${woodPath})`;
-    });
     
-    // Also update all tiles with the new wood texture
-    document.querySelectorAll('.tile').forEach(tile => {
-        tile.style.backgroundImage = `url(${woodPath})`;
-    });
+    // Update just the panel background
+    const panel = document.getElementById('panel');
+    if (panel) {
+        panel.style.backgroundImage = `url(${woodPath})`;
+    }
 });
 
 // Create a global WoodenPlanner object for backward compatibility

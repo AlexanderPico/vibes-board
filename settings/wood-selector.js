@@ -185,12 +185,7 @@ function setWoodTexture(woodType) {
         `url(${TEXTURE_PATH}${woodType}.jpg)`
     );
     
-    // Update elements that use the wood texture
-    document.querySelectorAll('.block, .widget').forEach(element => {
-        element.style.backgroundImage = `url(${TEXTURE_PATH}${woodType}.jpg)`;
-    });
-    
-    // Update panel
+    // Only update the board panel, not individual tiles/widgets
     const panel = document.getElementById('panel');
     if (panel) {
         panel.style.backgroundImage = `url(${TEXTURE_PATH}${woodType}.jpg)`;
