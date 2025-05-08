@@ -206,55 +206,131 @@ async function loadSvgForElement(element, svgPath) {
     }
 }
 
+// ===== DRAG & DROP UTILITIES =====
+
+// Helper function to find a tile by type
+function findTile(type) {
+    return document.querySelector(`.tile[data-tile="${type}"]`);
+}
+
+// Helper function to check if a slot is empty
+function slotIsEmpty(slot) {
+    return !slot.firstElementChild;
+}
+
+// Make an element draggable
+function makeDraggable(node, type) {
+    node.draggable = true;
+    node.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('widgetId', node.id);   // present for existing widgets
+        e.dataTransfer.setData('tile', type);      // always present
+        
+        // Add visual feedback during drag
+        setTimeout(() => {
+            node.classList.add('dragging');
+        }, 0);
+    });
+    
+    node.addEventListener('dragend', e => {
+        // Immediately remove the dragging class to end the tilt effect
+        node.classList.remove('dragging');
+        
+        // Only affect widgets, not tiles
+        if (node.classList.contains('widget')) {
+            // Force a style reset after a short delay to ensure transitions complete
+            setTimeout(() => {
+                // Additional safety check to ensure dragging class is gone
+                node.classList.remove('dragging');
+                
+                // Only reset if not in any special state
+                if (!node.classList.contains('dragging') && !node.classList.contains('lifting')) {
+                    // Clear any inline transform styles that might be lingering
+                    if (node.style.transform && node.style.transform !== 'none') {
+                        node.style.transform = 'none';
+                    }
+                }
+            }, 50);
+        }
+    });
+}
+
+// ===== LAYOUT PERSISTENCE =====
+
+// Save the current layout to localStorage
+function saveLayout() {
+    const slots = [...document.querySelectorAll('.slot')];
+    const layout = slots.map(sl => {
+        if (slotIsEmpty(sl)) return null;
+        
+        const widget = sl.firstElementChild;
+        return { 
+            slot: sl.dataset.slot, 
+            type: widget.dataset.tile,
+            wood: widget.dataset.wood
+        };
+    });
+    localStorage.setItem(`vibes-layout-v1`, JSON.stringify(layout));
+}
+
+// Load saved layout from localStorage
+async function loadLayout(slots) {
+    const layout = JSON.parse(localStorage.getItem(`vibes-layout-v1`) || '[]');
+    
+    // Process each item in the layout
+    for (const item of layout) {
+        if (!item) continue;
+        
+        const slot = document.querySelector(`.slot[data-slot="${item.slot}"]`);
+        const tile = findTile(item.type);
+        if (!slot || !tile || !slotIsEmpty(slot)) continue;
+
+        // Deep clone to preserve all elements
+        const widget = tile.cloneNode(true);
+        widget.classList.remove('tile');
+        widget.classList.add('widget');
+        
+        // Preserve wood type from layout data
+        if (item.wood) {
+            widget.dataset.wood = item.wood;
+        }
+        
+        // Get the module for this tile type to check if it has an SVG
+        const tileModule = modules[item.type];
+        const hasSvgImage = tileModule?.image?.endsWith('.svg');
+        
+        // Handle SVG content specifically for both refresh and initial load cases
+        if (hasSvgImage) {
+            widget.classList.add('has-svg');
+            
+            // Always load a fresh SVG for the widget during layout restoration
+            // This ensures it will appear correctly after page refresh
+            await loadSvgForElement(widget, tileModule.image);
+        }
+        
+        // Keep exact background image from original tile
+        widget.style.backgroundImage = tile.style.backgroundImage;
+        widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        makeDraggable(widget, item.type);
+
+        // Add the widget to the slot
+        slot.appendChild(widget);
+        
+        // Hide the tile in the palette to maintain tile state
+        tile.style.display = 'none';
+    }
+}
+
 // ===== DRAG & DROP INITIALIZATION =====
 
 // Initialize drag and drop functionality when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     // DOM refs
     const palette = document.getElementById('palette');
     const paletteContainer = document.getElementById('palette-tiles');
     const slots = [...document.querySelectorAll('.slot')];
 
-    // Helper functions
-    const findTile = type => document.querySelector(`.tile[data-tile="${type}"]`);
-    const slotIsEmpty = slot => !slot.firstElementChild;
-
-    // Make an element draggable
-    function makeDraggable(node, type) {
-        node.draggable = true;
-        node.addEventListener('dragstart', e => {
-            e.dataTransfer.setData('widgetId', node.id);   // present for existing widgets
-            e.dataTransfer.setData('tile', type);      // always present
-            
-            // Add visual feedback during drag
-            setTimeout(() => {
-                node.classList.add('dragging');
-            }, 0);
-        });
-        
-        node.addEventListener('dragend', e => {
-            // Immediately remove the dragging class to end the tilt effect
-            node.classList.remove('dragging');
-            
-            // Only affect widgets, not tiles
-            if (node.classList.contains('widget')) {
-                // Force a style reset after a short delay to ensure transitions complete
-                setTimeout(() => {
-                    // Additional safety check to ensure dragging class is gone
-                    node.classList.remove('dragging');
-                    
-                    // Only reset if not in any special state
-                    if (!node.classList.contains('dragging') && !node.classList.contains('lifting')) {
-                        // Clear any inline transform styles that might be lingering
-                        if (node.style.transform && node.style.transform !== 'none') {
-                            node.style.transform = 'none';
-                        }
-                    }
-                }, 50);
-            }
-        });
-    }
-
+    // findTile and slotIsEmpty are now defined globally above
+    
     // Create the palette tiles based on the modules registry
     function createPaletteTiles() {
         // Clear existing tiles
@@ -304,6 +380,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create initial palette tiles
     createPaletteTiles();
+    
+    // Load previous layout - important to wait for this to complete 
+    // before proceeding with other initializations
+    await loadLayout(slots);
 
     // Handle dropping a widget onto a slot
     function handleSlotDrop(e, slot) {
@@ -395,18 +475,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, { once: true });
     }
 
-    // Save the current layout to localStorage
-    function saveLayout() {
-        const layout = slots.map(sl =>
-            slotIsEmpty(sl) ? null : { 
-                slot: sl.dataset.slot, 
-                type: sl.firstElementChild.dataset.tile,
-                wood: sl.firstElementChild.dataset.wood
-            }
-        );
-        localStorage.setItem(`vibes-layout-v1`, JSON.stringify(layout));
-    }
-
     // Setup slots as drop targets
     slots.forEach(slot => {
         slot.addEventListener('dragover', e => {
@@ -463,44 +531,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Save the layout
             saveLayout();
         });
-    });
-
-    // Load previous layout
-    const layout = JSON.parse(localStorage.getItem(`vibes-layout-v1`) || '[]');
-    layout.forEach(item => {
-        if (!item) return;
-        const slot = document.querySelector(`.slot[data-slot="${item.slot}"]`);
-        const tile = findTile(item.type);
-        if (!slot || !tile || !slotIsEmpty(slot)) return;
-
-        // Deep clone to preserve all elements including SVG content
-        const widget = tile.cloneNode(true);
-        widget.classList.remove('tile');
-        widget.classList.add('widget');
-        
-        // Preserve wood type from layout data
-        if (item.wood) {
-            widget.dataset.wood = item.wood;
-        }
-        
-        // Handle SVG content
-        if (tile.classList.contains('has-svg')) {
-            widget.classList.add('has-svg');
-            
-            // If the original tile's SVG hasn't loaded yet, we need to load it for the widget
-            if (!widget.querySelector('svg') && modules[item.type]?.image?.endsWith('.svg')) {
-                // Load SVG for the widget
-                loadSvgForElement(widget, modules[item.type].image);
-            }
-        }
-        
-        // Keep exact background image from original tile
-        widget.style.backgroundImage = tile.style.backgroundImage;
-        widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        makeDraggable(widget, item.type);
-
-        slot.appendChild(widget);
-        tile.style.display = 'none'; // Hide the tile completely
     });
 
     // No need to apply wood texture to tiles
