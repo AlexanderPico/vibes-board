@@ -1,10 +1,10 @@
-// modules/gauge.js
+// tiles/sunrise.js
 // -----------------------------------------------------------------------------
-// Sunrise Tile Module
-// Replaces the original "gauge" widget with a mood‑based tile.
+// Sunrise Tile 
+// A mood-based tile for the vibes board.
 //
-//  • Shows a sunrise photo over a maple‑wood background
-//  • Carries keyword metadata for the quote‑generator
+//  • Shows a sunrise photo over a maple-wood background
+//  • Carries keyword metadata for the quote-generator
 //  • Exposes a create() factory the board calls when the tile is dropped
 // -----------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@ export default {
     /** Unique identifier used by the board logic */
     id: 'sunrise',
 
-    /** Human‑readable label (can be shown in tooltips, etc.) */
+    /** Human-readable label (can be shown in tooltips, etc.) */
     label: 'Sunrise',
 
     /** Path to the tile's overlay image */
@@ -34,10 +34,10 @@ export default {
         el.className = 'widget sunrise';
 
         // Apply the wood grain as a CSS variable so the global stylesheet
-        // can reuse it for carved‑text shadows, etc.
+        // can reuse it for carved-text shadows, etc.
         el.style.setProperty('--wood-url', 'url("./assets/wood/maple.jpg")');
 
-        // Layer the photo over the wood (photo first for object-fit behaviour,
+        // Layer the photo over the wood (photo first for object-fit behavior,
         // wood underneath so edges show through slightly)
         el.style.backgroundImage = `url(${this.image}), var(--wood-url)`;
         el.style.backgroundSize = 'cover';
@@ -47,7 +47,7 @@ export default {
         header.textContent = this.label;
         el.appendChild(header);
 
-        // Expose metadata on the element for quick lookup (drag‑and‑drop, etc.)
+        // Expose metadata on the element for quick lookup (drag-and-drop, etc.)
         el.dataset.tileId = this.id;
         el.dataset.keywords = this.keywords.join(',');
 

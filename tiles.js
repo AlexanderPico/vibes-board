@@ -1,10 +1,10 @@
 /**
- * Modules System - Core module management for Material Planner
+ * Tiles System - Core tile management for Vibes Board
  * Includes wood texture handling and drag-and-drop functionality
  */
 
 // Import individual modules
-import sunrise from './modules/sunrise.js';
+import sunrise from './tiles/sunrise.js';
 
 
 // ===== WOOD TEXTURE HANDLING (from module-look.js) =====
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const slots = [...document.querySelectorAll('.slot')];
 
     // Helper functions
-    const findTile = type => document.querySelector(`.tile[data-module="${type}"]`);
+    const findTile = type => document.querySelector(`.tile[data-tile="${type}"]`);
     const slotIsEmpty = slot => !slot.firstElementChild;
 
     // Make an element draggable
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         node.draggable = true;
         node.addEventListener('dragstart', e => {
             e.dataTransfer.setData('widgetId', node.id);   // present for existing widgets
-            e.dataTransfer.setData('module', type);      // always present
+            e.dataTransfer.setData('tile', type);      // always present
             
             // Add visual feedback during drag
             setTimeout(() => {
@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle dropping a widget onto a slot
     function handleSlotDrop(e, slot) {
         e.preventDefault();
-        const type = e.dataTransfer.getData('module');
+        const type = e.dataTransfer.getData('tile');
         const widId = e.dataTransfer.getData('widgetId');
 
         /* --- move an existing widget -------------------------------- */
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!w || slot === w.parentElement || !slotIsEmpty(slot)) return;
 
             /* update palette */
-            const oldTile = findTile(w.dataset.module);
+            const oldTile = findTile(w.dataset.tile);
             oldTile && (oldTile.style.display = ''); // Make the tile visible again
 
             // Only add background highlight to slot, not animation to widget
@@ -254,12 +254,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (typeof modules[type] === 'function') {
             widget = modules[type]();
         } else {
-            console.error(`Module ${type} is not properly structured`);
+            console.error(`Tile ${type} is not properly structured`);
             return;
         }
         
         widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        widget.dataset.module = type;
+        widget.dataset.tile = type;
         makeDraggable(widget, type);
         
         // Apply current wood texture 
@@ -294,14 +294,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save the current layout to localStorage
     function saveLayout() {
         const layout = slots.map(sl =>
-            slotIsEmpty(sl) ? null : { slot: sl.dataset.slot, type: sl.firstElementChild.dataset.module }
+            slotIsEmpty(sl) ? null : { slot: sl.dataset.slot, type: sl.firstElementChild.dataset.tile }
         );
         localStorage.setItem(`vibes-layout-v1`, JSON.stringify(layout));
     }
 
     // Make palette tiles draggable
     tiles.forEach(t => {
-        makeDraggable(t, t.dataset.module);
+        makeDraggable(t, t.dataset.tile);
     });
 
     // Setup slots as drop targets
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!widId) return;
 
         const w = document.getElementById(widId);
-        const type = w?.dataset.module;
+        const type = w?.dataset.tile;
         if (!w || !type) return;
 
         // Add return animation
@@ -377,12 +377,12 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (typeof modules[item.type] === 'function') {
             widget = modules[item.type]();
         } else {
-            console.error(`Module ${item.type} is not properly structured`);
+            console.error(`Tile ${item.type} is not properly structured`);
             return;
         }
         
         widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        widget.dataset.module = item.type;
+        widget.dataset.tile = item.type;
         makeDraggable(widget, item.type);
 
         slot.appendChild(widget);
