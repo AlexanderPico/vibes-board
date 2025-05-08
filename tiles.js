@@ -396,56 +396,102 @@ document.addEventListener('DOMContentLoaded', async () => {
         const type = e.dataTransfer.getData('tile');
         const widId = e.dataTransfer.getData('widgetId');
 
+        // Check if the slot is already occupied
+        const existingWidget = slot.firstElementChild;
+        const isSlotOccupied = !!existingWidget;
+
         /* --- move an existing widget -------------------------------- */
         if (widId) {
             const w = document.getElementById(widId);
-            if (!w || slot === w.parentElement || !slotIsEmpty(slot)) return;
+            if (!w || slot === w.parentElement) return;
 
-            /* update palette */
-            const oldTile = findTile(w.dataset.tile);
-            oldTile && (oldTile.style.display = ''); // Make the tile visible again
+            // If slot is occupied, perform a swap
+            if (isSlotOccupied) {
+                const existingType = existingWidget.dataset.tile;
+                const sourceSlot = w.parentElement;
+                
+                // Temporarily remove the widgets from their slots
+                if (sourceSlot) sourceSlot.removeChild(w);
+                slot.removeChild(existingWidget);
+                
+                // Place them in their new positions
+                slot.appendChild(w);
+                if (sourceSlot) sourceSlot.appendChild(existingWidget);
+                
+                // Ensure dragging classes are removed
+                setTimeout(() => {
+                    w.classList.remove('dragging');
+                    existingWidget.classList.remove('dragging');
+                }, 10);
+            } else {
+                // Standard move to empty slot
+                /* update palette */
+                const oldTile = findTile(w.dataset.tile);
+                oldTile && (oldTile.style.display = ''); // Make the tile visible again
 
-            // Only add background highlight to slot, not animation to widget
+                // Move the widget to the new slot
+                slot.appendChild(w);
+                
+                // Ensure dragging class is removed AFTER the widget is moved to new slot
+                setTimeout(() => {
+                    w.classList.remove('dragging');
+                }, 10);
+                
+                const newTile = findTile(type);
+                newTile && (newTile.style.display = 'none'); // Hide the tile
+            }
+
+            // Add background highlight to slot
             slot.classList.add('receiving');
             setTimeout(() => slot.classList.remove('receiving'), 300);
             
             // Play "thunk" sound
             playPlaceSound();
             
-            // Move the widget to the new slot
-            slot.appendChild(w);
-            
-            // Ensure dragging class is removed AFTER the widget is moved to new slot
-            setTimeout(() => {
-                w.classList.remove('dragging');
-            }, 10);
-            
-            const newTile = findTile(type);
-            newTile && (newTile.style.display = 'none'); // Hide the tile
             saveLayout();
             return;
         }
 
-        /* --- place a fresh tile ----------------------------------- */
-        if (!type || !slotIsEmpty(slot)) return;
+        /* --- place a fresh tile from palette ----------------------------- */
+        if (!type) return;
         const srcTile = findTile(type);
-        if (!srcTile || !slotIsEmpty(slot)) return;
+        if (!srcTile) return;
 
-        /* build widget */
-        // Deep clone to preserve all elements including SVG
-        const widget = srcTile.cloneNode(true);
-        widget.classList.remove('tile');
-        widget.classList.add('widget');
-        
-        // Preserve classes for SVG handling
-        if (srcTile.classList.contains('has-svg')) {
-            widget.classList.add('has-svg');
+        // Handle swap if slot is already occupied
+        if (isSlotOccupied) {
+            const existingType = existingWidget.dataset.tile;
+            
+            // If we're dropping a tile from the palette, return the existing widget to palette
+            // and place the new one in the slot
+            
+            // First make the existing widget's tile visible again in the palette
+            const existingTile = findTile(existingType);
+            if (existingTile) {
+                existingTile.style.display = '';
+            }
+            
+            // Remove the existing widget
+            slot.removeChild(existingWidget);
+            
+            // Build and place the new widget from the palette
+            const widget = createWidgetFromTile(srcTile, type);
+            slot.appendChild(widget);
+            
+            // Hide the source tile in the palette
+            srcTile.style.display = 'none';
+            
+            // Animation and sound
+            slot.classList.add('receiving');
+            setTimeout(() => slot.classList.remove('receiving'), 300);
+            playPlaceSound();
+            
+            saveLayout();
+            return;
         }
         
-        // Preserve exact background image and wood type
-        widget.style.backgroundImage = srcTile.style.backgroundImage;
-        widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        makeDraggable(widget, type);
+        // Standard case - empty slot
+        /* build widget */
+        const widget = createWidgetFromTile(srcTile, type);
 
         // Only add background highlight to slot
         slot.classList.add('receiving');
@@ -465,6 +511,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         srcTile.style.display = 'none'; // Hide the tile completely
         saveLayout();
+    }
+    
+    // Helper function to create a widget from a tile
+    function createWidgetFromTile(srcTile, type) {
+        // Deep clone to preserve all elements including SVG
+        const widget = srcTile.cloneNode(true);
+        widget.classList.remove('tile');
+        widget.classList.add('widget');
+        
+        // Ensure the dragging class is removed
+        widget.classList.remove('dragging');
+        
+        // Preserve classes for SVG handling
+        if (srcTile.classList.contains('has-svg')) {
+            widget.classList.add('has-svg');
+        }
+        
+        // Preserve exact background image and wood type
+        widget.style.backgroundImage = srcTile.style.backgroundImage;
+        if (srcTile.dataset.wood) {
+            widget.dataset.wood = srcTile.dataset.wood;
+        }
+        widget.id = `w-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        makeDraggable(widget, type);
+        
+        // Explicitly clear any transform styles that might be applied
+        widget.style.transform = 'none';
+        
+        return widget;
     }
 
     // Apply lifting animation to a widget before removing it
