@@ -1,11 +1,19 @@
-/* Add this at the top of the file */
+/* Root variables */
 :root {
     --wood-dark: #4a351f;
     --wood-medium: #5d432c;
     --wood-light: #7a5a3b;
+    
+    /* Wood-specific SVG styling */
+    --svg-maple-color: rgba(70, 30, 5, 0.85);
+    --svg-oak-color: rgba(60, 35, 10, 0.8);
+    --svg-cherry-color: rgba(85, 25, 20, 0.85);
+    --svg-walnut-color: rgba(50, 30, 15, 0.9);
+    --svg-beech-color: rgba(80, 55, 30, 0.8);
+    --svg-bamboo-color: rgba(45, 60, 20, 0.8);
 }
 
-/* ---- reset / base ---- */
+/* ---- Base styles ---- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -26,31 +34,19 @@ button {
     cursor: pointer;
 }
 
-/* ---- gear button ---- */
-#gear {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    background: #5d432c;
-    color: #faf9f7;
-    border: none;
-    padding: .4rem .6rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .4);
+[hidden] {
+    display: none !important;
 }
 
-/* ---- wooden panel & slots ---- */
+/* ---- Layout ---- */
 #panel {
-    --wood-url: url("./assets/wood/oak.jpg");  /* default changed to oak */
-    background:
-        var(--wood-url) center/cover;
+    --wood-url: url("./assets/wood/oak.jpg");
+    background: var(--wood-url) center/cover;
     box-shadow:
-        inset 0 1px 2px rgba(255, 255, 255, .15),  /* highlight */
-        inset 0 -2px 4px rgba(0, 0, 0, .3),   /* inner shadow */
-        0 10px 30px rgba(0, 0, 0, .8);   /* deep shadow */
+        inset 0 1px 2px rgba(255, 255, 255, .15),
+        inset 0 -2px 4px rgba(0, 0, 0, .3),
+        0 10px 30px rgba(0, 0, 0, .8);
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
     gap: 1.5rem;
     padding: 2rem;
     border-radius: 12px;
@@ -58,6 +54,8 @@ button {
     height: 400px;
     position: relative;
     border: 4px solid var(--wood-dark);
+    margin-left: 180px;
+    margin-right: 200px;
 }
 
 #panel::before {
@@ -70,31 +68,7 @@ button {
     pointer-events: none;
 }
 
-.slot {
-    background: rgba(0, 0, 0, .2);
-    border-radius: 10px;
-    min-height: 8rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    box-shadow: 
-        inset 0 4px 8px rgba(0, 0, 0, 0.5),
-        inset 0 2px 4px rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.2s ease;
-}
-
-/* ---- workbench overlay ---- */
-#workbench {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, .75);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
+/* Palette styles */
 #palette {
     background: #3c352e;
     border-right: 6px solid #5d432c;
@@ -112,7 +86,7 @@ button {
     overflow-y: auto;
 }
 
-#palette h2 {
+#palette h2, #wood-selector h2 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
     text-transform: uppercase;
@@ -122,170 +96,84 @@ button {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-#palette ul {
-    list-style: none;
+/* Slot styles */
+.slot {
+    background: rgba(0, 0, 0, .2);
+    border-radius: 10px;
+    min-height: 8rem;
     display: flex;
-    flex-direction: column;
-    gap: .6rem;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 
+        inset 0 4px 8px rgba(0, 0, 0, 0.5),
+        inset 0 2px 4px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
 }
 
-#palette li button {
-    width: 100%;
-    padding: .5rem;
-    border-radius: 6px;
-    border: none;
-    background: #5d432c;
-    color: #faf9f7;
+.slot.drag-over {
+    outline: 3px dashed #fff;
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: scale(1.02);
+    box-shadow: 
+        inset 0 4px 8px rgba(0, 0, 0, 0.5),
+        inset 0 2px 4px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(255, 255, 255, 0.2);
 }
 
-#palette .save {
-    margin-top: auto;
-    background: #226e4a;
-}
-
-/* ---- widget common styling ---- */
-.widget {
+.slot .widget {
     width: 100%;
     height: 100%;
+}
+
+/* Common tile and widget styles */
+.tile, .widget {
+    background-size: cover !important;
+    background-position: center !important;
+    position: relative;
+    border: 3px solid var(--wood-dark);
+    border-radius: 10px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: .8rem;
     box-shadow: 
         0 8px 16px rgba(0, 0, 0, 0.4),
         inset 0 1px 3px rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    border: 3px solid var(--wood-dark);
-    padding: 1rem;
-    transform: none; /* Reset any transform to avoid tilting */
-    /* Background image is set by cloning from the tile */
 }
 
-/* Add wood grain effect to widgets */
-.widget .grain, 
-.widget::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.08' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
-    pointer-events: none;
-    opacity: 0.4;
-    border-radius: 6px;
-    mix-blend-mode: overlay;
-    z-index: 1;
-}
-
-.widget::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(60, 40, 20, 0.3);
-    border-radius: 6px;
-    pointer-events: none;
-    z-index: -1;
-}
-
-.widget header, 
-.widget .carved-text,
-.widget span {
-    font-weight: 600;
-    margin-bottom: .3rem;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-    background-color: rgba(0, 0, 0, 0.15);
-    padding: 0.4rem 0.8rem;
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 
-        inset 0 1px 3px rgba(0, 0, 0, 0.8),
-        0 1px 0 rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.85);
-    text-shadow: 
-        0 -1px 1px rgba(0, 0, 0, 0.8),
-        0 1px 0 rgba(255, 255, 255, 0.2);
-    letter-spacing: 1px;
-    position: relative;
-    transform: translateZ(2px); /* Subtle lift */
-}
-
-
-.help-tooltip {
-    position: absolute;
-    top: 35px;
-    right: 10px;
-    background: rgba(30, 30, 30, 0.9);
-    color: #fff;
-    padding: 10px;
-    border-radius: 4px;
-    width: 200px;
-    z-index: 100;
-    font-size: 0.8rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-}
-
-.help-tooltip.visible {
-    opacity: 1;
-}
-
-
-.gauge-needle {
-    width: 4px;
-    height: 50%;
-    background: #faf9f7;
-    transform-origin: bottom center;
-}
-
-/* reduced motion support */
-@media(prefers-reduced-motion:reduce) {
-    #panel:hover {
-        transform: none;
-    }
-}
-
-/* --- ensure any element with [hidden] disappears regardless of later rules --- */
-[hidden] {
-    display: none !important;
-}
-
+/* Tile-specific styles */
 .tile {
-    background: var(--wood-medium);
     width: 130px;
-    height: 130px; /* Make tiles square */
-    border-radius: 10px;
+    height: 130px;
     cursor: grab;
     user-select: none;
-    text-align: center;
-    font-size: 1rem;
-    box-shadow: 
-        0 8px 16px rgba(0, 0, 0, 0.4), /* Match widget shadow */
-        inset 0 1px 3px rgba(255, 255, 255, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 3px solid var(--wood-dark);
-    position: relative;
     margin-bottom: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-image: var(--wood-url);
-    background-size: cover;
-    background-position: center;
     transform-style: preserve-3d;
     transform-origin: center bottom;
-    overflow: hidden; /* Match widget overflow */
+}
+
+.tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 10px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.tile:active {
+    cursor: grabbing;
+    transform: perspective(800px) rotateX(15deg) rotateY(-5deg) translateZ(10px);
+    box-shadow: 
+        10px 15px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.tile.dragging {
+    opacity: 0.7;
+    transform: scale(1.05) translateY(-5px);
 }
 
 /* Add subtle edge to create tile effect */
@@ -295,117 +183,23 @@ button {
     top: 100%;
     left: 0;
     width: 100%;
-    height: 6px; /* Thinner than cube for a tile appearance */
+    height: 6px;
     background-color: var(--wood-dark);
     transform-origin: top;
     transform: rotateX(-90deg);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     background-image: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 20%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0.4) 100%);
-    opacity: 0.8; /* Subtle edge */
+    opacity: 0.8;
 }
 
-/* Wood grain overlay */
-.tile .grain {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.08' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
-    pointer-events: none;
-    opacity: 0.5; /* Consistent opacity */
-    border-radius: 6px;
-    mix-blend-mode: overlay;
-}
-
-/* Carved/inlaid text effect for tiles */
-.tile span {
-    font-family: 'Palatino', serif;
-    font-weight: bold;
-    display: inline-block;
-    padding: 8px 12px;
-    position: relative;
-    background-color: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 
-        inset 0 1px 3px rgba(0, 0, 0, 0.8),
-        0 1px 0 rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.85);
-    text-shadow: 
-        0 -1px 1px rgba(0, 0, 0, 0.8),
-        0 1px 0 rgba(255, 255, 255, 0.2);
-    letter-spacing: 1px;
-    position: relative;
-    transform: translateZ(2px); /* Subtle lift */
-}
-
-/* Add a subtle wood grain texture to the carved text */
-.tile span::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.15' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
-    opacity: 0.7;
-    mix-blend-mode: overlay;
-    pointer-events: none;
-    border-radius: inherit;
-}
-
-.tile:hover {
-    /* Remove the tilting effect on hover - only show a subtle lift */
-    transform: translateY(-2px);
-    box-shadow: 
-        0 10px 20px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-.tile:active {
-    cursor: grabbing;
-    /* Apply the same tilt effect as widgets when active */
-    transform: perspective(800px) rotateX(15deg) rotateY(-5deg) translateZ(10px);
-    box-shadow: 
-        10px 15px 20px rgba(0, 0, 0, 0.4),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-}
-
-/* Animation for tiles being dragged */
-.tile.dragging {
-    opacity: 0.7;
-    transform: scale(1.05) translateY(-5px);
-}
-
-/* shift board right */
-#panel {
-    margin-left: 180px;
-    margin-right: 200px;
-    /* palette width + gap */
-}
-
-/* Animation for slots highlighting when hovering with valid drag */
-.slot.drag-over {
-    outline: 3px dashed #fff;
-    background-color: rgba(255, 255, 255, 0.15);
-    transition: all 0.3s ease;
-    transform: scale(1.02);
-    box-shadow: 
-        inset 0 4px 8px rgba(0, 0, 0, 0.5),
-        inset 0 2px 4px rgba(0, 0, 0, 0.6),
-        0 0 20px rgba(255, 255, 255, 0.2);
-}
-
-/* make dropped widget fill slot area fully */
-.slot .widget {
+/* Widget-specific styles */
+.widget {
     width: 100%;
     height: 100%;
+    transition: transform 0.3s ease-out;
 }
 
-/* Make widgets appear tilted when dragging or lifting from slots */
 .widget:active, .widget.dragging {
     cursor: grabbing;
     transform: perspective(800px) rotateX(15deg) rotateY(-5deg) translateZ(10px) !important;
@@ -413,11 +207,9 @@ button {
         10px 15px 20px rgba(0, 0, 0, 0.4),
         inset 0 1px 2px rgba(255, 255, 255, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    /* Keep the z-index high when dragging to appear above other elements */
     z-index: 10;
 }
 
-/* Reset widget transform when dragging ends - make this more specific */
 .widget:not(.dragging):not(:active):not(.lifting) {
     transform: none !important;
     box-shadow: 
@@ -426,21 +218,145 @@ button {
     transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
 }
 
-/* Animation for receiving a widget */
+/* Wood grain overlay for tiles and widgets */
+.tile .grain, .widget .grain, .widget::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.08' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.1'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.5;
+    border-radius: 6px;
+    mix-blend-mode: overlay;
+    z-index: 1;
+}
+
+/* SVG styling and burned wood effect */
+/* Replace individual tile styling with wood-type based styling */
+.tile[data-wood="maple"] svg, .widget[data-wood="maple"] svg { 
+    stroke: var(--svg-maple-color);
+}
+
+.tile[data-wood="oak"] svg, .widget[data-wood="oak"] svg { 
+    stroke: var(--svg-oak-color);
+}
+
+.tile[data-wood="cherry"] svg, .widget[data-wood="cherry"] svg { 
+    stroke: var(--svg-cherry-color);
+}
+
+.tile[data-wood="walnut"] svg, .widget[data-wood="walnut"] svg { 
+    stroke: var(--svg-walnut-color);
+}
+
+.tile[data-wood="beech"] svg, .widget[data-wood="beech"] svg { 
+    stroke: var(--svg-beech-color);
+}
+
+.tile[data-wood="bamboo"] svg, .widget[data-wood="bamboo"] svg { 
+    stroke: var(--svg-bamboo-color);
+}
+
+/* Remove specific tile-based styling since we're organizing by wood type */
+.tile.has-svg svg, .widget.has-svg svg, .burned-svg {
+    width: 80%;
+    height: 80%;
+    stroke-width: 2;
+    fill: none;
+    mix-blend-mode: multiply;
+    opacity: 0.75;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+/* Wood-specific burned edge effects */
+.tile[data-wood="maple"].has-svg::after, .widget[data-wood="maple"].has-svg::after {
+    background: radial-gradient(circle at center, 
+                               transparent 20%, 
+                               rgba(70, 30, 5, 0.12) 50%, 
+                               transparent 80%);
+    opacity: 0.85;
+}
+
+.tile[data-wood="oak"].has-svg::after, .widget[data-wood="oak"].has-svg::after {
+    background: radial-gradient(circle at center, 
+                               transparent 20%, 
+                               rgba(60, 35, 10, 0.15) 50%, 
+                               transparent 80%);
+    opacity: 0.8;
+}
+
+.tile[data-wood="cherry"].has-svg::after, .widget[data-wood="cherry"].has-svg::after {
+    background: radial-gradient(circle at center, 
+                               transparent 20%, 
+                               rgba(85, 25, 20, 0.12) 50%, 
+                               transparent 80%);
+    opacity: 0.75;
+}
+
+.tile[data-wood="walnut"].has-svg::after, .widget[data-wood="walnut"].has-svg::after {
+    background: radial-gradient(circle at center, 
+                               transparent 20%, 
+                               rgba(50, 30, 15, 0.18) 50%, 
+                               transparent 80%);
+    opacity: 0.9;
+}
+
+.tile[data-wood="beech"].has-svg::after, .widget[data-wood="beech"].has-svg::after {
+    background: radial-gradient(circle at center, 
+                               transparent 20%, 
+                               rgba(80, 55, 30, 0.1) 50%, 
+                               transparent 80%);
+    opacity: 0.7;
+}
+
+.tile[data-wood="bamboo"].has-svg::after, .widget[data-wood="bamboo"].has-svg::after {
+    background: radial-gradient(circle at center, 
+                               transparent 20%, 
+                               rgba(45, 60, 20, 0.12) 50%, 
+                               transparent 80%);
+    opacity: 0.75;
+}
+
+/* Base burned effect for all wood types (fallback and shared properties) */
+.tile.has-svg::after, .widget.has-svg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Interactive SVG effects (same for all wood types) */
+.tile.has-svg:active svg, .widget.has-svg:active svg {
+    opacity: 0.85;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6));
+    transform: translate(-50%, -50%) scale(1.05);
+    transition: all 0.2s ease;
+}
+
+/* Animation styles */
 .receiving {
     animation: receive-widget 0.3s ease-out;
 }
 
 @keyframes receive-widget {
-    0% { 
-        background-color: rgba(255, 255, 255, 0.3);
-    }
-    100% { 
-        background-color: rgba(255, 255, 255, 0.06);
-    }
+    0% { background-color: rgba(255, 255, 255, 0.3); }
+    100% { background-color: rgba(255, 255, 255, 0.06); }
 }
 
-/* Animation for removing a widget (lifting off the board) */
 @keyframes lift-widget {
     0% {
         transform: perspective(800px) rotateX(2deg) rotateY(0deg) translateZ(0);
@@ -461,19 +377,7 @@ button {
     animation: lift-widget 0.3s ease-out forwards;
 }
 
-/* Enhance ripple effect for sound visualization */
-@keyframes ripple {
-    0% {
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(2);
-        opacity: 0;
-    }
-}
-
-/* ---- wood selector panel ---- */
+/* Wood selector styles */
 #wood-selector {
     background: #3c352e;
     border-left: 6px solid #5d432c;
@@ -491,11 +395,6 @@ button {
     align-items: center;
 }
 
-#wood-selector h2 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-}
-
 .texture-ring {
     width: 140px;
     height: 140px;
@@ -508,7 +407,7 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    perspective: 700px; /* Add perspective for 3D effect */
+    perspective: 700px;
 }
 
 .texture-dot {
@@ -522,17 +421,15 @@ button {
     background-size: cover;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    /* Enhanced 3D effect with transform-style */
     transform-style: preserve-3d;
     backface-visibility: hidden;
-    /* Subtle texture effect */
     background-blend-mode: multiply;
 }
 
 .texture-dot:hover {
     transform: scale(1.15) translateZ(8px) !important;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.8) !important;
-    z-index: 25 !important; /* Always on top when hovered */
+    z-index: 25 !important;
 }
 
 .texture-dot::after {
@@ -550,29 +447,12 @@ button {
 }
 
 /* Wood texture backgrounds */
-.texture-dot[data-wood="bamboo"] {
-    background-image: url("./assets/wood/bamboo.jpg");
-}
-
-.texture-dot[data-wood="beech"] {
-    background-image: url("./assets/wood/beech.jpg");
-}
-
-.texture-dot[data-wood="cherry"] {
-    background-image: url("./assets/wood/cherry.jpg");
-}
-
-.texture-dot[data-wood="maple"] {
-    background-image: url("./assets/wood/maple.jpg");
-}
-
-.texture-dot[data-wood="oak"] {
-    background-image: url("./assets/wood/oak.jpg");
-}
-
-.texture-dot[data-wood="walnut"] {
-    background-image: url("./assets/wood/walnut.jpg");
-}
+.texture-dot[data-wood="bamboo"] { background-image: url("./assets/wood/bamboo.jpg"); }
+.texture-dot[data-wood="beech"] { background-image: url("./assets/wood/beech.jpg"); }
+.texture-dot[data-wood="cherry"] { background-image: url("./assets/wood/cherry.jpg"); }
+.texture-dot[data-wood="maple"] { background-image: url("./assets/wood/maple.jpg"); }
+.texture-dot[data-wood="oak"] { background-image: url("./assets/wood/oak.jpg"); }
+.texture-dot[data-wood="walnut"] { background-image: url("./assets/wood/walnut.jpg"); }
 
 .texture-dot.active {
     border: 1px solid var(--wood-light);
@@ -582,15 +462,9 @@ button {
 }
 
 @keyframes glow {
-    0% {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), 0 0 5px rgba(255, 255, 255, 0.5);
-    }
-    50% {
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 255, 255, 0.7);
-    }
-    100% {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), 0 0 5px rgba(255, 255, 255, 0.5);
-    }
+    0% { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), 0 0 5px rgba(255, 255, 255, 0.5); }
+    50% { box-shadow: 0 6px 12px rgba(0, 0, 0, 0.9), 0 0 15px rgba(255, 255, 255, 0.7); }
+    100% { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), 0 0 5px rgba(255, 255, 255, 0.5); }
 }
 
 .wood-name {
@@ -604,144 +478,16 @@ button {
     min-width: 100px;
 }
 
-/* For tooltips that must be centered in the widget */
-.day-tooltip.centered {
-    position: fixed; /* Change to fixed to prevent shifting */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    min-height: 140px;
-    max-height: 80%;
-    overflow: auto;
-    z-index: 250;
-    margin: 0;
-    width: auto;
-    max-width: 90%;
-    pointer-events: auto; /* Ensure it receives pointer events */
-    will-change: transform; /* Optimize for animations/transitions */
-    backface-visibility: hidden; /* Prevent flickering */
-    transform-style: preserve-3d; /* Maintain 3D context */
-}
+/* Border colors for different wood types */
+.tile[data-wood="oak"], .widget[data-wood="oak"] { border-color: #5d432c; }
+.tile[data-wood="maple"], .widget[data-wood="maple"] { border-color: #bb9b7c; }
+.tile[data-wood="cherry"], .widget[data-wood="cherry"] { border-color: #8e443d; }
+.tile[data-wood="walnut"], .widget[data-wood="walnut"] { border-color: #4a351f; }
+.tile[data-wood="beech"], .widget[data-wood="beech"] { border-color: #d7bc91; }
+.tile[data-wood="bamboo"], .widget[data-wood="bamboo"] { border-color: #7d8e6e; }
 
-.widget svg {
-    width: 80%;
-    /* scales to tile */
-    height: 80%;
-    stroke: #000;
-    fill: none;
-    stroke-width: 2;
-    mix-blend-mode: multiply;
-    opacity: .65;
-    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .4));
-}
-
-/* Wood type textures - applied based on data attributes */
-.widget[data-wood="oak"] {
-    border-color: #5d432c;
-}
-
-.widget[data-wood="maple"] {
-    border-color: #bb9b7c;
-}
-
-.widget[data-wood="cherry"] {
-    border-color: #8e443d;
-}
-
-.widget[data-wood="walnut"] {
-    border-color: #4a351f;
-}
-
-.widget[data-wood="beech"] {
-    border-color: #d7bc91;
-}
-
-.widget[data-wood="bamboo"] {
-    border-color: #7d8e6e;
-}
-
-/* Ensure image layers correctly over wood background */
-.widget[data-image], .tile[data-image] {
-    background-blend-mode: normal;
-}
-
-/* Border colors based on wood type - keep these to match wood types */
-.tile[data-wood="oak"], .widget[data-wood="oak"] {
-    border-color: #5d432c;
-}
-
-.tile[data-wood="maple"], .widget[data-wood="maple"] {
-    border-color: #bb9b7c;
-}
-
-.tile[data-wood="cherry"], .widget[data-wood="cherry"] {
-    border-color: #8e443d;
-}
-
-.tile[data-wood="walnut"], .widget[data-wood="walnut"] {
-    border-color: #4a351f;
-}
-
-.tile[data-wood="beech"], .widget[data-wood="beech"] {
-    border-color: #d7bc91;
-}
-
-.tile[data-wood="bamboo"], .widget[data-wood="bamboo"] {
-    border-color: #7d8e6e;
-}
-
-/* Target the specific sunrise icon to match color in the image (black in palette, reddish on board) */
-.tile[data-tile="sunrise"], .widget[data-tile="sunrise"] {
-    --icon-color: rgba(70, 30, 5, 0.85);
-}
-
-/* Apply burned wood effect for SVGs */
-.tile.has-svg svg, .widget.has-svg svg, .burned-svg {
-    width: 80%;
-    height: 80%;
-    stroke: var(--icon-color, rgba(70, 30, 5, 0.85));
-    fill: none;
-    stroke-width: 2;
-    mix-blend-mode: multiply;
-    opacity: 0.75;
-    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-}
-
-/* Create burned wood effect with radial gradient overlay */
-.tile.has-svg::after, .widget.has-svg::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: inherit;
-    background: radial-gradient(circle at center, 
-                               transparent 20%, 
-                               rgba(0, 0, 0, 0.15) 50%, 
-                               transparent 80%);
-    mix-blend-mode: multiply;
-    pointer-events: none;
-    opacity: 0.8;
-    z-index: 1;
-}
-
-/* Enhance SVG appearance on interaction */
-.tile.has-svg:active svg, .widget.has-svg:active svg {
-    opacity: 0.85;
-    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6));
-    transform: translate(-50%, -50%) scale(1.05);
-    transition: all 0.2s ease;
-}
-
-/* Ensure the span label is always on top and readable */
-.tile span, .widget span {
-    z-index: 2;
-    position: relative;
+/* Media queries */
+@media(prefers-reduced-motion:reduce) {
+    #panel:hover { transform: none; }
 }
 

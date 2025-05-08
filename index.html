@@ -16,7 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="style.css" />
     <style>
-        /* Override panel layout for 3 horizontal slots */
+        /* Panel layout with 3 horizontal slots */
         #panel {
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: auto 1fr;
@@ -31,76 +31,61 @@
             margin-bottom: 1.5rem;
         }
         
-        /* Make slots square */
+        /* Slot styling */
         .slot {
             aspect-ratio: 1/1;
             width: 100%;
             max-width: 160px;
             margin: 0 auto;
-            background: rgba(0, 0, 0, 0.15); /* Lighter background */
+            background: rgba(0, 0, 0, 0.15);
         }
         
-        .slot[data-slot="1"] {
-            grid-area: slot1;
-        }
+        .slot[data-slot="1"] { grid-area: slot1; }
+        .slot[data-slot="2"] { grid-area: slot2; }
+        .slot[data-slot="3"] { grid-area: slot3; }
         
-        .slot[data-slot="2"] {
-            grid-area: slot2;
-        }
-        
-        .slot[data-slot="3"] {
-            grid-area: slot3;
-        }
-        
-        /* Visual consistency between tiles and widgets */
+        /* Common tile and widget styles */
         .tile, .widget {
             background-size: cover !important;
             background-position: center !important;
         }
         
-        /* Widget styling to match its original tile */
+        /* Widget styling */
         .widget {
             width: 100%;
             height: 100%;
             border-radius: 8px;
             position: relative;
             overflow: hidden;
-            /* Only reset transform when NOT dragging */
             transition: transform 0.3s ease-out;
         }
         
-        /* Allow tilting during drag */
-        .widget.dragging {
-            /* No transform:none here to allow tilting */
-        }
-        
-        /* Ensure the slot's wood type doesn't override the widget's */
+        /* Ensure slot doesn't override widget's styles */
         .slot > .widget {
-            background-image: inherit; /* Use exactly what was cloned */
+            background-image: inherit;
         }
     </style>
 </head>
 
 <body>
-    <!-- Wooden-tile palette -->
+    <!-- Tile palette -->
     <aside id="palette">
         <h2>Tiles</h2>
-        <!-- Tile will be populated from tiles.js using each tile's self-defined wood type -->
         <div id="palette-tiles"></div>
     </aside>
 
-    <!-- Main wooden panel -->
-    <main id="panel" aria-label="Planner board">
-        <!-- Message area for quotes/messages -->
+    <!-- Main board -->
+    <main id="panel" aria-label="Vibes Board">
+        <!-- Message area -->
         <div id="message-area"></div>
         
-        <!-- 3 horizontal tile slots -->
+        <!-- Slots for tiles -->
         <div class="slot empty" data-slot="1"></div>
         <div class="slot empty" data-slot="2"></div>
         <div class="slot empty" data-slot="3"></div>
     </main>
 
-    <!-- Wood texture selector -->
+    <!-- Wood selector -->
     <aside id="wood-selector">
         <h2>Settings</h2>
         <div class="texture-ring">

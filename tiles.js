@@ -6,8 +6,7 @@
 // Import individual modules
 import sunrise from './tiles/sunrise.js';
 
-
-// ===== WOOD TEXTURE HANDLING (from module-look.js) =====
+// ===== WOOD TEXTURE HANDLING =====
 
 // Simple noise implementation for procedural wood textures
 class SimpleNoise {
@@ -176,6 +175,37 @@ export const utils = {
     applyWoodTexture
 };
 
+// ===== SVG LOADING UTILITIES =====
+
+// Function to load and apply SVG to a tile or widget
+async function loadSvgForElement(element, svgPath) {
+    if (!svgPath || !svgPath.endsWith('.svg')) return;
+    
+    try {
+        // Fetch the SVG content
+        const response = await fetch(svgPath);
+        const svgContent = await response.text();
+        
+        // Create SVG element from the content
+        const parser = new DOMParser();
+        const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+        const svgElement = svgDoc.documentElement;
+        
+        // Set attributes for styling
+        svgElement.setAttribute('width', '80%');
+        svgElement.setAttribute('height', '80%');
+        svgElement.setAttribute('class', 'burned-svg');
+        
+        // Append SVG directly to element
+        element.appendChild(svgElement);
+        
+        // Add the has-svg class to ensure proper styling
+        element.classList.add('has-svg');
+    } catch (error) {
+        console.error('Error loading SVG:', error);
+    }
+}
+
 // ===== DRAG & DROP INITIALIZATION =====
 
 // Initialize drag and drop functionality when DOM is loaded
@@ -241,35 +271,16 @@ document.addEventListener('DOMContentLoaded', () => {
             grain.className = 'grain';
             tile.appendChild(grain);
             
-            // Store wood type in dataset for persistence
+            // Apply wood type if specified
             if (tileModule.wood) {
                 const woodPath = `./assets/wood/${tileModule.wood}.jpg`;
                 tile.dataset.wood = tileModule.wood;
-                // Set background to the module's wood type
                 tile.style.backgroundImage = `url(${woodPath})`;
                 
-                // Special handling for SVG images - fetch and add directly to create burned effect
+                // Handle SVG images - using the new wood-type based styling
                 if (tileModule.image && tileModule.image.endsWith('.svg')) {
-                    tile.classList.add('has-svg');
-                    
-                    // Fetch the SVG content
-                    fetch(tileModule.image)
-                        .then(response => response.text())
-                        .then(svgContent => {
-                            // Create SVG element from the content
-                            const parser = new DOMParser();
-                            const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
-                            const svgElement = svgDoc.documentElement;
-                            
-                            // Set attributes for styling
-                            svgElement.setAttribute('width', '80%');
-                            svgElement.setAttribute('height', '80%');
-                            svgElement.setAttribute('class', 'burned-svg');
-                            
-                            // Append SVG directly to tile
-                            tile.appendChild(svgElement);
-                        })
-                        .catch(error => console.error('Error loading SVG:', error));
+                    // Load SVG asynchronously
+                    loadSvgForElement(tile, tileModule.image);
                 }
                 // Apply image if available but not SVG
                 else if (tileModule.image) {
@@ -387,7 +398,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Save the current layout to localStorage
     function saveLayout() {
         const layout = slots.map(sl =>
-            slotIsEmpty(sl) ? null : { slot: sl.dataset.slot, type: sl.firstElementChild.dataset.tile }
+            slotIsEmpty(sl) ? null : { 
+                slot: sl.dataset.slot, 
+                type: sl.firstElementChild.dataset.tile,
+                wood: sl.firstElementChild.dataset.wood
+            }
         );
         localStorage.setItem(`vibes-layout-v1`, JSON.stringify(layout));
     }
@@ -463,30 +478,19 @@ document.addEventListener('DOMContentLoaded', () => {
         widget.classList.remove('tile');
         widget.classList.add('widget');
         
-        // Preserve classes for SVG handling
+        // Preserve wood type from layout data
+        if (item.wood) {
+            widget.dataset.wood = item.wood;
+        }
+        
+        // Handle SVG content
         if (tile.classList.contains('has-svg')) {
             widget.classList.add('has-svg');
             
             // If the original tile's SVG hasn't loaded yet, we need to load it for the widget
             if (!widget.querySelector('svg') && modules[item.type]?.image?.endsWith('.svg')) {
-                // Fetch the SVG content
-                fetch(modules[item.type].image)
-                    .then(response => response.text())
-                    .then(svgContent => {
-                        // Create SVG element from the content
-                        const parser = new DOMParser();
-                        const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
-                        const svgElement = svgDoc.documentElement;
-                        
-                        // Set attributes for styling
-                        svgElement.setAttribute('width', '80%');
-                        svgElement.setAttribute('height', '80%');
-                        svgElement.setAttribute('class', 'burned-svg');
-                        
-                        // Append SVG directly to widget
-                        widget.appendChild(svgElement);
-                    })
-                    .catch(error => console.error('Error loading SVG for widget:', error));
+                // Load SVG for the widget
+                loadSvgForElement(widget, modules[item.type].image);
             }
         }
         
@@ -527,12 +531,18 @@ document.addEventListener('woodTypeChanged', (e) => {
     }
 });
 
-// Create a global WoodenPlanner object for backward compatibility
-window.WoodenPlanner = {
-    sunrise
+// Create a global Vibes object for API access
+window.Vibes = {
+    modules,
+    wood: {
+        getCurrentType: () => window.getCurrentWoodType ? window.getCurrentWoodType() : 'oak',
+        setWood
+    },
+    audio: {
+        init: initAudio,
+        playSound: playWoodSound
+    }
 };
 
-// Make modules and audio functions available globally
-window.modules = modules;
-window.initAudio = initAudio;
-window.playWoodSound = playWoodSound; 
+// Legacy compatibility
+window.WoodenPlanner = window.Vibes; 
