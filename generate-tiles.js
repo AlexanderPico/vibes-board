@@ -3,7 +3,7 @@
  * 
  * This script reads the gen-tiles.json file and generates individual JavaScript
  * module files for each tile entry. It follows the structure template of the
- * existing tile modules and ensures proper paths are used.
+ * existing tiles and ensures proper paths are used.
  */
 
 const fs = require('fs');
@@ -68,15 +68,15 @@ export default {
     console.log(`Generated ${fileName}`);
 });
 
-console.log('All tile modules generated successfully!');
+console.log('All tiles generated successfully!');
 
 // Generate a modules import file
-const modulesFile = `tiles/all-modules.js`;
+const modulesFile = `tiles/all-tiles.js`;
 const importLines = tilesData.map(tile => `import ${tile.id} from './${tile.id}.js';`).join('\n');
 const exportObject = `export default {\n    ${tilesData.map(tile => tile.id).join(',\n    ')}\n};`;
 
 const modulesContent = `/**
- * All Tile Modules
+ * All Tiles
  * Generated from gen-tiles.json
  */
 

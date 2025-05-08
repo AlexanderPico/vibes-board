@@ -1,5 +1,5 @@
 /**
- * All Tile Modules
+ * All Tiles
  * Generated from gen-tiles.json
  */
 
@@ -35,6 +35,13 @@ import umbrella from './umbrella.js';
 import warning from './warning.js';
 import wave from './wave.js';
 import wind from './wind.js';
+import seedling from './seedling.js';
+import hourglass from './hourglass.js';
+import compass from './compass.js';
+import telescope from './telescope.js';
+import lightbulb from './lightbulb.js';
+import shield from './shield.js';
+import scales from './scales.js';
 
 export default {
     battle,
@@ -68,5 +75,12 @@ export default {
     umbrella,
     warning,
     wave,
-    wind
+    wind,
+    seedling,
+    hourglass,
+    compass,
+    telescope,
+    lightbulb,
+    shield,
+    scales
 };

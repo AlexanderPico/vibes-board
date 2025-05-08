@@ -3,13 +3,8 @@
  * Includes wood texture handling and drag-and-drop functionality
  */
 
-// Import individual modules
-import sunrise from './tiles/sunrise.js';
-import bird from './tiles/bird.js';
-import mountains from './tiles/mountains.js';
-import smile from './tiles/smile.js';
-// Import all generated modules
-import allModules from './tiles/all-modules.js';
+// Import all generated tiles
+import allModules from './tiles/all-tiles.js';
 
 // ===== WOOD TEXTURE HANDLING =====
 
@@ -172,7 +167,7 @@ export const save = (key, val) => {
     localStorage.setItem(`vibes-${key}`, JSON.stringify(val)); 
 };
 
-// Export common utilities for use by modules
+// Export common utilities for use by tiles
 export const utils = {
     pad: n => n.toString().padStart(2, '0'),
     yyyymm: d => `${d.getFullYear()}-${utils.pad(d.getMonth() + 1)}`,
@@ -336,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // findTile and slotIsEmpty are now defined globally above
     
-    // Create the palette tiles based on the modules registry
+    // Create the palette tiles based on the tile registry
     function createPaletteTiles() {
         // Clear existing tiles
         paletteContainer.innerHTML = '';
@@ -624,14 +619,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-// Create and export module registry
+// Create and export tile registry
 export const modules = {
-    // Include the manually imported tiles
-    sunrise,
-    bird,
-    mountains,
-    smile,
-    // Include all generated modules
+    // Include all generated tiles
     ...allModules
 };
 

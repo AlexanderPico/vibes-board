@@ -382,5 +382,89 @@
             "freedom",
             "breath"
         ]
+    },
+    {
+        "id": "seedling",
+        "label": "Seedling",
+        "image": "./assets/img/seedling.svg",
+        "wood": "cherry",
+        "keywords": [
+            "growth",
+            "potential",
+            "nurture",
+            "beginnings"
+        ]
+    },
+    {
+        "id": "hourglass",
+        "label": "Hourglass",
+        "image": "./assets/img/hourglass.svg",
+        "wood": "beech",
+        "keywords": [
+            "time",
+            "urgency",
+            "patience",
+            "opportunity"
+        ]
+    },
+    {
+        "id": "compass",
+        "label": "Compass",
+        "image": "./assets/img/compass.svg",
+        "wood": "bamboo",
+        "keywords": [
+            "direction",
+            "guidance",
+            "exploration",
+            "purpose"
+        ]
+    },
+    {
+        "id": "telescope",
+        "label": "Telescope",
+        "image": "./assets/img/telescope.svg",
+        "wood": "maple",
+        "keywords": [
+            "vision",
+            "future",
+            "aspiration",
+            "focus"
+        ]
+    },
+    {
+        "id": "lightbulb",
+        "label": "Light‑bulb",
+        "image": "./assets/img/lightbulb.svg",
+        "wood": "oak",
+        "keywords": [
+            "idea",
+            "innovation",
+            "insight",
+            "creativity"
+        ]
+    },
+    {
+        "id": "shield",
+        "label": "Shield",
+        "image": "./assets/img/shield.svg",
+        "wood": "walnut",
+        "keywords": [
+            "protection",
+            "resilience",
+            "security",
+            "strength"
+        ]
+    },
+    {
+        "id": "scales",
+        "label": "Scales",
+        "image": "./assets/img/scales.svg",
+        "wood": "cherry",
+        "keywords": [
+            "balance",
+            "harmony",
+            "judgement",
+            "stability"
+        ]
     }
 ]
