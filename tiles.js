@@ -331,13 +331,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // findTile and slotIsEmpty are now defined globally above
     
-    // Create the palette tiles based on the tile registry
+    // Create the palette tiles based on the modules registry
     function createPaletteTiles() {
         // Clear existing tiles
         paletteContainer.innerHTML = '';
         
-        // For each registered tile type
-        Object.entries(modules).forEach(([key, tileModule]) => {
+        // Convert module entries to array, then sort by label
+        const sortedTiles = Object.entries(modules)
+            .map(([key, tileModule]) => ({ key, ...tileModule }))
+            .sort((a, b) => (a.label || a.key).localeCompare(b.label || b.key));
+        
+        // For each registered tile type (now sorted)
+        sortedTiles.forEach(tileModule => {
+            const key = tileModule.key;
             const tile = document.createElement('div');
             tile.className = 'tile';
             tile.dataset.tile = key;
