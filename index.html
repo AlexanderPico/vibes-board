@@ -1,0 +1,95 @@
+<!-- =================================================
+  Wooden Planner – Tangible Wood Block Interface (v0.8)
+  2025‑05‑08
+  * Consolidated modules for better maintainability
+  * Combined look and drag-and-drop into core modules system
+  * Fixed audio initialization and improved loading sequence
+================================================= -->
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Wooden Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Override panel layout for 3 horizontal slots */
+        #panel {
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            grid-template-areas:
+                "message message message"
+                "slot1 slot2 slot3";
+        }
+        
+        #message-area {
+            grid-area: message;
+            min-height: 100px;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Make slots square */
+        .slot {
+            aspect-ratio: 1/1;
+            width: 100%;
+            max-width: 160px;
+            margin: 0 auto;
+        }
+        
+        .slot[data-slot="1"] {
+            grid-area: slot1;
+        }
+        
+        .slot[data-slot="2"] {
+            grid-area: slot2;
+        }
+        
+        .slot[data-slot="3"] {
+            grid-area: slot3;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Wooden-tile palette -->
+    <aside id="palette">
+        <h2>Tiles</h2>
+        <div class="tile" data-module="sunrise">
+            <span>Sunrise</span>
+            <div class="grain"></div>
+        </div>
+    </aside>
+
+    <!-- Main wooden panel -->
+    <main id="panel" aria-label="Planner board">
+        <!-- Message area for quotes/messages -->
+        <div id="message-area"></div>
+        
+        <!-- 3 horizontal tile slots -->
+        <div class="slot empty" data-slot="1"></div>
+        <div class="slot empty" data-slot="2"></div>
+        <div class="slot empty" data-slot="3"></div>
+    </main>
+
+    <!-- Wood texture selector -->
+    <aside id="wood-selector">
+        <h2>Settings</h2>
+        <div class="texture-ring">
+            <div class="texture-dot" data-wood="bamboo"></div>
+            <div class="texture-dot" data-wood="beech"></div>
+            <div class="texture-dot" data-wood="cherry"></div>
+            <div class="texture-dot" data-wood="maple"></div>
+            <div class="texture-dot" data-wood="oak"></div>
+            <div class="texture-dot" data-wood="walnut"></div>
+        </div>
+        <div class="wood-name">Bamboo</div>
+    </aside>
+
+    <!-- scripts -->
+    <script src="modules.js" type="module"></script>
+    <script src="settings/wood-selector.js" type="module"></script>
+</body>
+
+</html>
