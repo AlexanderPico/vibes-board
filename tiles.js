@@ -5,6 +5,11 @@
 
 // Import individual modules
 import sunrise from './tiles/sunrise.js';
+import bird from './tiles/bird.js';
+import mountains from './tiles/mountains.js';
+import smile from './tiles/smile.js';
+// Import all generated modules
+import allModules from './tiles/all-modules.js';
 
 // ===== WOOD TEXTURE HANDLING =====
 
@@ -546,7 +551,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Create and export module registry
 export const modules = {
-    sunrise
+    // Include the manually imported tiles
+    sunrise,
+    bird,
+    mountains,
+    smile,
+    // Include all generated modules
+    ...allModules
 };
 
 // Listen for wood type changes - only apply to board, not tiles

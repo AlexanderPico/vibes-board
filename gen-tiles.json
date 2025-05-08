@@ -1,0 +1,386 @@
+[
+    {
+        "id": "battle",
+        "label": "Battle",
+        "image": "./assets/img/battle.svg",
+        "wood": "oak",
+        "keywords": [
+            "conflict",
+            "courage",
+            "struggle",
+            "victory"
+        ]
+    },
+    {
+        "id": "bird",
+        "label": "Bird",
+        "image": "./assets/img/bird.svg",
+        "wood": "bamboo",
+        "keywords": [
+            "freedom",
+            "flight",
+            "lightness",
+            "song"
+        ]
+    },
+    {
+        "id": "breaking",
+        "label": "Breaking Chain",
+        "image": "./assets/img/breaking.svg",
+        "wood": "walnut",
+        "keywords": [
+            "liberation",
+            "strength",
+            "boldness",
+            "change"
+        ]
+    },
+    {
+        "id": "cat",
+        "label": "Cat",
+        "image": "./assets/img/cat.svg",
+        "wood": "cherry",
+        "keywords": [
+            "curiosity",
+            "independence",
+            "comfort",
+            "playfulness"
+        ]
+    },
+    {
+        "id": "cloud_lightning",
+        "label": "Storm Cloud",
+        "image": "./assets/img/cloud-lightning.svg",
+        "wood": "walnut",
+        "keywords": [
+            "energy",
+            "tension",
+            "power",
+            "release"
+        ]
+    },
+    {
+        "id": "cloud",
+        "label": "Cloud",
+        "image": "./assets/img/cloud.svg",
+        "wood": "maple",
+        "keywords": [
+            "calm",
+            "drift",
+            "dreams",
+            "softness"
+        ]
+    },
+    {
+        "id": "evil",
+        "label": "Demon",
+        "image": "./assets/img/evil.svg",
+        "wood": "walnut",
+        "keywords": [
+            "fear",
+            "shadow",
+            "challenge",
+            "overcome"
+        ]
+    },
+    {
+        "id": "feather",
+        "label": "Feather",
+        "image": "./assets/img/feather.svg",
+        "wood": "bamboo",
+        "keywords": [
+            "grace",
+            "ease",
+            "lightness",
+            "delicacy"
+        ]
+    },
+    {
+        "id": "frown",
+        "label": "Frown",
+        "image": "./assets/img/frown.svg",
+        "wood": "beech",
+        "keywords": [
+            "sadness",
+            "concern",
+            "reflection",
+            "growth"
+        ]
+    },
+    {
+        "id": "injured",
+        "label": "Injured",
+        "image": "./assets/img/injured.svg",
+        "wood": "beech",
+        "keywords": [
+            "healing",
+            "vulnerability",
+            "patience",
+            "resilience"
+        ]
+    },
+    {
+        "id": "lovers",
+        "label": "Lovers",
+        "image": "./assets/img/lovers.svg",
+        "wood": "cherry",
+        "keywords": [
+            "love",
+            "connection",
+            "affection",
+            "unity"
+        ]
+    },
+    {
+        "id": "meh",
+        "label": "Meh",
+        "image": "./assets/img/meh.svg",
+        "wood": "beech",
+        "keywords": [
+            "neutral",
+            "indifference",
+            "pause",
+            "acceptance"
+        ]
+    },
+    {
+        "id": "mighty",
+        "label": "Mighty",
+        "image": "./assets/img/mighty.svg",
+        "wood": "oak",
+        "keywords": [
+            "power",
+            "confidence",
+            "strength",
+            "determination"
+        ]
+    },
+    {
+        "id": "money",
+        "label": "Money",
+        "image": "./assets/img/money.svg",
+        "wood": "oak",
+        "keywords": [
+            "wealth",
+            "abundance",
+            "value",
+            "opportunity"
+        ]
+    },
+    {
+        "id": "moon",
+        "label": "Moon",
+        "image": "./assets/img/moon.svg",
+        "wood": "walnut",
+        "keywords": [
+            "mystery",
+            "intuition",
+            "night",
+            "cycles"
+        ]
+    },
+    {
+        "id": "mountains",
+        "label": "Mountains",
+        "image": "./assets/img/mountains.svg",
+        "wood": "oak",
+        "keywords": [
+            "endurance",
+            "perspective",
+            "grandeur",
+            "steadfast"
+        ]
+    },
+    {
+        "id": "party",
+        "label": "Party",
+        "image": "./assets/img/party.svg",
+        "wood": "maple",
+        "keywords": [
+            "celebration",
+            "joy",
+            "community",
+            "fun"
+        ]
+    },
+    {
+        "id": "question",
+        "label": "Question",
+        "image": "./assets/img/question.svg",
+        "wood": "beech",
+        "keywords": [
+            "curiosity",
+            "wonder",
+            "exploration",
+            "learning"
+        ]
+    },
+    {
+        "id": "raining",
+        "label": "Raining",
+        "image": "./assets/img/raining.svg",
+        "wood": "walnut",
+        "keywords": [
+            "cleansing",
+            "reflection",
+            "renewal",
+            "calm"
+        ]
+    },
+    {
+        "id": "river",
+        "label": "River",
+        "image": "./assets/img/river.svg",
+        "wood": "bamboo",
+        "keywords": [
+            "flow",
+            "change",
+            "journey",
+            "continuity"
+        ]
+    },
+    {
+        "id": "smile",
+        "label": "Smile",
+        "image": "./assets/img/smile.svg",
+        "wood": "maple",
+        "keywords": [
+            "happiness",
+            "positivity",
+            "warmth",
+            "kindness"
+        ]
+    },
+    {
+        "id": "snowing",
+        "label": "Snowing",
+        "image": "./assets/img/snowing.svg",
+        "wood": "beech",
+        "keywords": [
+            "quiet",
+            "purity",
+            "stillness",
+            "wonder"
+        ]
+    },
+    {
+        "id": "sun",
+        "label": "Sun",
+        "image": "./assets/img/sun.svg",
+        "wood": "maple",
+        "keywords": [
+            "energy",
+            "brightness",
+            "vitality",
+            "clarity"
+        ]
+    },
+    {
+        "id": "sunrise",
+        "label": "Sunrise",
+        "image": "./assets/img/sunrise.svg",
+        "wood": "maple",
+        "keywords": [
+            "hope",
+            "renewal",
+            "dawn",
+            "optimism"
+        ]
+    },
+    {
+        "id": "sunset",
+        "label": "Sunset",
+        "image": "./assets/img/sunset.svg",
+        "wood": "cherry",
+        "keywords": [
+            "reflection",
+            "closure",
+            "warmth",
+            "peace"
+        ]
+    },
+    {
+        "id": "thumbs_up",
+        "label": "Thumbs‑Up",
+        "image": "./assets/img/thumbs-up.svg",
+        "wood": "maple",
+        "keywords": [
+            "approval",
+            "success",
+            "confidence",
+            "encouragement"
+        ]
+    },
+    {
+        "id": "treasure",
+        "label": "Treasure",
+        "image": "./assets/img/treasure.svg",
+        "wood": "oak",
+        "keywords": [
+            "discovery",
+            "reward",
+            "riches",
+            "gratitude"
+        ]
+    },
+    {
+        "id": "tree",
+        "label": "Tree",
+        "image": "./assets/img/tree.svg",
+        "wood": "oak",
+        "keywords": [
+            "growth",
+            "roots",
+            "stability",
+            "life"
+        ]
+    },
+    {
+        "id": "umbrella",
+        "label": "Umbrella",
+        "image": "./assets/img/umbrella.svg",
+        "wood": "beech",
+        "keywords": [
+            "protection",
+            "preparedness",
+            "shelter",
+            "comfort"
+        ]
+    },
+    {
+        "id": "warning",
+        "label": "Warning",
+        "image": "./assets/img/warning.svg",
+        "wood": "walnut",
+        "keywords": [
+            "caution",
+            "alert",
+            "attention",
+            "readiness"
+        ]
+    },
+    {
+        "id": "wave",
+        "label": "Wave",
+        "image": "./assets/img/wave.svg",
+        "wood": "bamboo",
+        "keywords": [
+            "motion",
+            "adaptability",
+            "rhythm",
+            "refresh"
+        ]
+    },
+    {
+        "id": "wind",
+        "label": "Wind",
+        "image": "./assets/img/wind.svg",
+        "wood": "bamboo",
+        "keywords": [
+            "change",
+            "movement",
+            "freedom",
+            "breath"
+        ]
+    }
+]

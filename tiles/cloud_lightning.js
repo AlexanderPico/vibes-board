@@ -1,31 +1,31 @@
-// tiles/sunrise.js
+// tiles/cloud_lightning.js
 // -----------------------------------------------------------------------------
-// Sunrise Tile 
+// Storm Cloud Tile 
 // A mood-based tile for the vibes board.
 //
-//  • Shows a burned SVG icon on a maple wood background
-//  • Uses wood-type based styling for consistent look across the maple wood set
+//  • Shows a burned SVG icon on a walnut wood background
+//  • Uses wood-type based styling for consistent look across the walnut wood set
 //  • Carries keyword metadata for mood/atmosphere setting
 // -----------------------------------------------------------------------------
 
 export default {
     /** Unique identifier used by the board logic */
-    id: 'sunrise',
+    id: 'cloud_lightning',
 
     /** Human-readable label for tooltips and accessibility */
-    label: 'Sunrise',
+    label: 'Storm Cloud',
 
     /** Path to the SVG icon */
-    image: './assets/img/sunrise.svg',
+    image: './assets/img/cloud-lightning.svg',
 
     /** Wood type that best complements this tile */
-    wood: 'maple',
+    wood: 'walnut',
 
     /** Keywords for mood/atmosphere generation */
-    keywords: [    'hope',
-    'renewal',
-    'dawn',
-    'optimism'],
+    keywords: [    'energy',
+    'tension',
+    'power',
+    'release'],
 
     /**
      * Legacy create method - no longer used with the new SVG tile system

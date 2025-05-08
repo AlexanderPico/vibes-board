@@ -1,6 +1,6 @@
-// tiles/sunrise.js
+// tiles/party.js
 // -----------------------------------------------------------------------------
-// Sunrise Tile 
+// Party Tile 
 // A mood-based tile for the vibes board.
 //
 //  • Shows a burned SVG icon on a maple wood background
@@ -10,22 +10,22 @@
 
 export default {
     /** Unique identifier used by the board logic */
-    id: 'sunrise',
+    id: 'party',
 
     /** Human-readable label for tooltips and accessibility */
-    label: 'Sunrise',
+    label: 'Party',
 
     /** Path to the SVG icon */
-    image: './assets/img/sunrise.svg',
+    image: './assets/img/party.svg',
 
     /** Wood type that best complements this tile */
     wood: 'maple',
 
     /** Keywords for mood/atmosphere generation */
-    keywords: [    'hope',
-    'renewal',
-    'dawn',
-    'optimism'],
+    keywords: [    'celebration',
+    'joy',
+    'community',
+    'fun'],
 
     /**
      * Legacy create method - no longer used with the new SVG tile system
