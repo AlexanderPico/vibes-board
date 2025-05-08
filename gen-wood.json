@@ -1,0 +1,68 @@
+[
+    {
+        "wood": "maple",
+        "tone": "Motivational—upbeat and forward‑looking",
+        "keywords": [
+            "warmth",
+            "clarity",
+            "uplift",
+            "freshness",
+            "positivity"
+        ]
+    },
+    {
+        "wood": "oak",
+        "tone": "Stoic—steady, authoritative, classical rhetoric",
+        "keywords": [
+            "strength",
+            "steadfastness",
+            "tradition",
+            "endurance",
+            "reliability"
+        ]
+    },
+    {
+        "wood": "walnut",
+        "tone": "Introspective—deep, contemplative, quietly powerful",
+        "keywords": [
+            "depth",
+            "contemplation",
+            "wisdom",
+            "resilience",
+            "mystery"
+        ]
+    },
+    {
+        "wood": "beech",
+        "tone": "Mindful—calm, balanced, reflective, gentle guidance",
+        "keywords": [
+            "calm",
+            "neutrality",
+            "reflection",
+            "acceptance",
+            "balance"
+        ]
+    },
+    {
+        "wood": "bamboo",
+        "tone": "Eastern‑philosophical—Confucian/Taoist simplicity and harmony, haiku-like",
+        "keywords": [
+            "flexibility",
+            "growth",
+            "adaptability",
+            "serenity",
+            "lightness"
+        ]
+    },
+    {
+        "wood": "cherry",
+        "tone": "Poetic—warm, affectionate, lightly lyrical",
+        "keywords": [
+            "warmth",
+            "affection",
+            "renewal",
+            "harmony",
+            "gentleness"
+        ]
+    }
+]
