@@ -264,7 +264,7 @@ button {
     background: var(--wood-medium);
     width: 130px;
     height: 130px; /* Make tiles square */
-    border-radius: 6px;
+    border-radius: 10px;
     cursor: grab;
     user-select: none;
     text-align: center;
@@ -273,7 +273,7 @@ button {
         0 8px 16px rgba(0, 0, 0, 0.4), /* Match widget shadow */
         inset 0 1px 3px rgba(255, 255, 255, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 2px solid var(--wood-dark);
+    border: 3px solid var(--wood-dark);
     position: relative;
     margin-bottom: 1.5rem;
     display: flex;
@@ -691,21 +691,52 @@ button {
 }
 
 /* Target the specific sunrise icon to match color in the image (black in palette, reddish on board) */
-.tile[data-tile="sunrise"] {
-    --icon-color: black;
+.tile[data-tile="sunrise"], .widget[data-tile="sunrise"] {
+    --icon-color: rgba(70, 30, 5, 0.85);
 }
 
-.widget[data-tile="sunrise"] {
-    --icon-color: #8e443d;
+/* Apply burned wood effect for SVGs */
+.tile.has-svg svg, .widget.has-svg svg, .burned-svg {
+    width: 80%;
+    height: 80%;
+    stroke: var(--icon-color, rgba(70, 30, 5, 0.85));
+    fill: none;
+    stroke-width: 2;
+    mix-blend-mode: multiply;
+    opacity: 0.75;
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
 }
 
-/* Apply filter based on palette vs board to achieve the different colors */
-.tile.has-svg {
-    filter: brightness(0.8) contrast(1.2);
+/* Create burned wood effect with radial gradient overlay */
+.tile.has-svg::after, .widget.has-svg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at center, 
+                               transparent 20%, 
+                               rgba(0, 0, 0, 0.15) 50%, 
+                               transparent 80%);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    opacity: 0.8;
+    z-index: 1;
 }
 
-.widget.has-svg {
-    filter: sepia(0.3) brightness(1.05);
+/* Enhance SVG appearance on interaction */
+.tile.has-svg:active svg, .widget.has-svg:active svg {
+    opacity: 0.85;
+    filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6));
+    transform: translate(-50%, -50%) scale(1.05);
+    transition: all 0.2s ease;
 }
 
 /* Ensure the span label is always on top and readable */
@@ -713,3 +744,4 @@ button {
     z-index: 2;
     position: relative;
 }
+

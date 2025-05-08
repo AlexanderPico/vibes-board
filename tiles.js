@@ -236,12 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tile.className = 'tile';
             tile.dataset.tile = key;
             
-            // Create the label
-            const label = document.createElement('span');
-            label.textContent = tileModule.label || key;
-            tile.appendChild(label);
-            
-            // Create the grain div
+            // Create the grain div for wood texture overlay
             const grain = document.createElement('div');
             grain.className = 'grain';
             tile.appendChild(grain);
@@ -253,8 +248,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Set background to the module's wood type
                 tile.style.backgroundImage = `url(${woodPath})`;
                 
-                // Apply image if available
-                if (tileModule.image) {
+                // Special handling for SVG images - fetch and add directly to create burned effect
+                if (tileModule.image && tileModule.image.endsWith('.svg')) {
+                    tile.classList.add('has-svg');
+                    
+                    // Fetch the SVG content
+                    fetch(tileModule.image)
+                        .then(response => response.text())
+                        .then(svgContent => {
+                            // Create SVG element from the content
+                            const parser = new DOMParser();
+                            const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                            const svgElement = svgDoc.documentElement;
+                            
+                            // Set attributes for styling
+                            svgElement.setAttribute('width', '80%');
+                            svgElement.setAttribute('height', '80%');
+                            svgElement.setAttribute('class', 'burned-svg');
+                            
+                            // Append SVG directly to tile
+                            tile.appendChild(svgElement);
+                        })
+                        .catch(error => console.error('Error loading SVG:', error));
+                }
+                // Apply image if available but not SVG
+                else if (tileModule.image) {
                     tile.dataset.image = tileModule.image;
                     // Layer image over wood
                     tile.style.backgroundImage = `url(${tileModule.image}), url(${woodPath})`;
@@ -318,11 +336,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!srcTile || !slotIsEmpty(slot)) return;
 
         /* build widget */
-        // For consistency, create a clone to preserve all properties
+        // Deep clone to preserve all elements including SVG
         const widget = srcTile.cloneNode(true);
         widget.classList.remove('tile');
         widget.classList.add('widget');
-        // No dragging class removal here - will be handled by dragend event
+        
+        // Preserve classes for SVG handling
+        if (srcTile.classList.contains('has-svg')) {
+            widget.classList.add('has-svg');
+        }
         
         // Preserve exact background image and wood type
         widget.style.backgroundImage = srcTile.style.backgroundImage;
@@ -436,11 +458,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const tile = findTile(item.type);
         if (!slot || !tile || !slotIsEmpty(slot)) return;
 
-        // Clone tile to preserve all properties including background
+        // Deep clone to preserve all elements including SVG content
         const widget = tile.cloneNode(true);
         widget.classList.remove('tile');
         widget.classList.add('widget');
-        // No dragging class removal here - only needed during active drag operations
+        
+        // Preserve classes for SVG handling
+        if (tile.classList.contains('has-svg')) {
+            widget.classList.add('has-svg');
+            
+            // If the original tile's SVG hasn't loaded yet, we need to load it for the widget
+            if (!widget.querySelector('svg') && modules[item.type]?.image?.endsWith('.svg')) {
+                // Fetch the SVG content
+                fetch(modules[item.type].image)
+                    .then(response => response.text())
+                    .then(svgContent => {
+                        // Create SVG element from the content
+                        const parser = new DOMParser();
+                        const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+                        const svgElement = svgDoc.documentElement;
+                        
+                        // Set attributes for styling
+                        svgElement.setAttribute('width', '80%');
+                        svgElement.setAttribute('height', '80%');
+                        svgElement.setAttribute('class', 'burned-svg');
+                        
+                        // Append SVG directly to widget
+                        widget.appendChild(svgElement);
+                    })
+                    .catch(error => console.error('Error loading SVG for widget:', error));
+            }
+        }
         
         // Keep exact background image from original tile
         widget.style.backgroundImage = tile.style.backgroundImage;
