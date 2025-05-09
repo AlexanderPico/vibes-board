@@ -651,6 +651,32 @@ button {
 .tile[data-wood="beech"], .widget[data-wood="beech"] { border-color: #d7bc91; }
 .tile[data-wood="bamboo"], .widget[data-wood="bamboo"] { border-color: #b1824a; }
 
+/* Adjust texture zoom/resolution */
+.tile[data-wood="bamboo"], .widget[data-wood="bamboo"], .texture-dot[data-wood="bamboo"] { 
+    background-size: 200% !important;
+    background-position: center !important; 
+}
+.tile[data-wood="oak"], .widget[data-wood="oak"], .texture-dot[data-wood="oak"] {
+    background-size: 200% !important;
+    background-position: center !important;
+}
+.tile[data-wood="maple"], .widget[data-wood="maple"], .texture-dot[data-wood="maple"] {
+    background-size: 200% !important;
+    background-position: center !important;
+}
+.tile[data-wood="cherry"], .widget[data-wood="cherry"], .texture-dot[data-wood="cherry"] {
+    background-size: 200% !important;
+    background-position: center !important;
+}
+.tile[data-wood="walnut"], .widget[data-wood="walnut"], .texture-dot[data-wood="walnut"] {
+    background-size: 200% !important;
+    background-position: center !important;
+}
+.tile[data-wood="beech"], .widget[data-wood="beech"], .texture-dot[data-wood="beech"] {
+    background-size: 200% !important;
+    background-position: center !important;
+}
+
 /* Media queries */
 @media(prefers-reduced-motion:reduce) {
     #panel:hover { transform: none; }
