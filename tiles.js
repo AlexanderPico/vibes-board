@@ -657,9 +657,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 10);
             } else {
                 // Standard move to empty slot
-            /* update palette */
-            const oldTile = findTile(w.dataset.tile);
-            oldTile && (oldTile.style.display = ''); // Make the tile visible again
+                /* update palette */
+                const oldTile = findTile(w.dataset.tile);
+                oldTile && (oldTile.style.display = ''); // Make the tile visible again
 
                 // Move the widget to the new slot
                 slot.appendChild(w);
@@ -681,6 +681,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             playPlaceSound();
             
             saveLayout();
+            
+            // Check if all slots are filled after the widget is moved
+            setTimeout(checkAllSlotsFilled, 300);
+            
             return;
         }
 
@@ -718,6 +722,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             playPlaceSound();
             
             saveLayout();
+            
+            // Check if all slots are filled after the widget is moved
+            setTimeout(checkAllSlotsFilled, 300);
+            
             return;
         }
         
@@ -850,10 +858,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Save the layout
             saveLayout();
+            
+            // Immediately check if we should hide the message
+            // This ensures the message resets properly when a tile is removed
+            checkAllSlotsFilled();
         });
-
-        // Check if all slots are filled after removal
-        setTimeout(checkAllSlotsFilled, 500);
     });
 
     // No need to apply wood texture to tiles
@@ -899,12 +908,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Hide the whisper message
     function hideWhisperMessage() {
+        // Remove all special classes
         messageArea.classList.remove('revealed', 'long-quote', 'very-long-quote', 'error-message');
         
-        // Keep the content structure intact but hide it
-        if (!messageArea.querySelector('span')) {
-            messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+        // Reset the content to the default
+        messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+        
+        // Remove any click event handlers
+        if (messageArea.dataset.listenerAdded) {
+            messageArea.removeEventListener('click', handleWhisperClick);
+            delete messageArea.dataset.listenerAdded;
         }
+        
+        // Reset any inline styles that might have been applied
+        messageArea.style.transform = 'translateY(5px)';
+        messageArea.style.opacity = '0';
     }
     
     // Add this function before handleWhisperClick
@@ -1081,6 +1099,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Check initial state after loading
     setTimeout(checkAllSlotsFilled, 1000);
+
+    // Setup a mutation observer to monitor slot changes
+    // This ensures the message area is updated if slots change through any means
+    const slotObserver = new MutationObserver((mutations) => {
+        let shouldCheck = false;
+        
+        // Check if any of the mutations affect the slots
+        mutations.forEach(mutation => {
+            if (mutation.type === 'childList' && 
+                mutation.target.classList.contains('slot')) {
+                shouldCheck = true;
+            }
+        });
+        
+        // If slots have changed, check if all are filled
+        if (shouldCheck) {
+            checkAllSlotsFilled();
+        }
+    });
+    
+    // Observe all slots for changes to their children
+    slots.forEach(slot => {
+        slotObserver.observe(slot, { childList: true });
+    });
 });
 
 // ===== TILE MODULES =====
