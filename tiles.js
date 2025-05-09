@@ -792,19 +792,61 @@ document.addEventListener('DOMContentLoaded', async () => {
             "presence_penalty": 0.2
         };
         
-        // Log the whisper data to console (would be sent to an API in production)
-        console.log('Whisper Data:', whisperData);
-        
-        // Provide feedback to user
+        // Show loading state
         const originalText = messageArea.querySelector('span').textContent;
-        messageArea.innerHTML = '<span>Whisper sent...</span>';
+        messageArea.innerHTML = '<span>Sending whisper...</span>';
         
-        // Reset after a delay
-        setTimeout(() => {
-            if (messageArea.innerHTML === '<span>Whisper sent...</span>') {
-                messageArea.innerHTML = `<span>${originalText}</span>`;
+        // Send the whisper data to our Netlify function
+        async function sendWhisperToGroq() {
+            try {
+                // In development, use the relative path to the Netlify function
+                // In production on Netlify, the /.netlify/functions/ path will be used
+                const endpoint = window.location.hostname === 'localhost' 
+                    ? '/.netlify/functions/whisper' 
+                    : '/.netlify/functions/whisper';
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(whisperData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Display the quote in the message area
+                if (data.quote) {
+                    messageArea.innerHTML = `<span>${data.quote}</span>`;
+                    
+                    // After displaying quote, add click handler to reset
+                    messageArea.addEventListener('click', () => {
+                        messageArea.innerHTML = `<span>${originalText}</span>`;
+                    }, { once: true });
+                } else {
+                    // Fallback if no quote is returned
+                    messageArea.innerHTML = `<span>${originalText}</span>`;
+                }
+            } catch (error) {
+                console.error('Error sending whisper:', error);
+                messageArea.innerHTML = `<span>Whisper echoed into silence...</span>`;
+                
+                // Reset after a delay
+                setTimeout(() => {
+                    messageArea.innerHTML = `<span>${originalText}</span>`;
+                }, 3000);
             }
-        }, 2000);
+        }
+        
+        // Execute the async function
+        sendWhisperToGroq();
+        
+        // Log the whisper data to console for debugging
+        console.log('Whisper Data:', whisperData);
         
         // Dispatch a custom event that other parts of the app can listen for
         document.dispatchEvent(new CustomEvent('whisperGenerated', {
