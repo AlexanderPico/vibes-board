@@ -218,19 +218,19 @@ function slotIsEmpty(slot) {
     return !slot.firstElementChild;
 }
 
-// Make an element draggable
-function makeDraggable(node, type) {
-    node.draggable = true;
-    node.addEventListener('dragstart', e => {
-        e.dataTransfer.setData('widgetId', node.id);   // present for existing widgets
-        e.dataTransfer.setData('tile', type);      // always present
+    // Make an element draggable
+    function makeDraggable(node, type) {
+        node.draggable = true;
+        node.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('widgetId', node.id);   // present for existing widgets
+            e.dataTransfer.setData('tile', type);      // always present
+            
+            // Add visual feedback during drag
+            setTimeout(() => {
+                node.classList.add('dragging');
+            }, 0);
+        });
         
-        // Add visual feedback during drag
-        setTimeout(() => {
-            node.classList.add('dragging');
-        }, 0);
-    });
-    
     node.addEventListener('dragend', e => {
         // Immediately remove the dragging class to end the tilt effect
         node.classList.remove('dragging');
@@ -240,7 +240,7 @@ function makeDraggable(node, type) {
             // Force a style reset after a short delay to ensure transitions complete
             setTimeout(() => {
                 // Additional safety check to ensure dragging class is gone
-                node.classList.remove('dragging');
+            node.classList.remove('dragging');
                 
                 // Only reset if not in any special state
                 if (!node.classList.contains('dragging') && !node.classList.contains('lifting')) {
@@ -320,6 +320,47 @@ async function loadLayout(slots) {
     }
 }
 
+// ===== WOOD INFORMATION =====
+
+// Define wood types with tone and keywords - will be used for generating whispers
+const woodInfo = [
+    {
+        wood: "maple",
+        tone: "Motivational—upbeat and forward‑looking",
+        keywords: ["warmth", "clarity", "uplift", "freshness", "positivity"]
+    },
+    {
+        wood: "oak",
+        tone: "Stoic—steady, authoritative, classical rhetoric",
+        keywords: ["strength", "steadfastness", "tradition", "endurance", "reliability"]
+    },
+    {
+        wood: "walnut",
+        tone: "Introspective—deep, contemplative, quietly powerful",
+        keywords: ["depth", "contemplation", "wisdom", "resilience", "mystery"]
+    },
+    {
+        wood: "beech",
+        tone: "Mindful—calm, balanced, reflective, gentle guidance",
+        keywords: ["calm", "neutrality", "reflection", "acceptance", "balance"]
+    },
+    {
+        wood: "bamboo",
+        tone: "Eastern‑philosophical—Confucian/Taoist simplicity and harmony, haiku-like",
+        keywords: ["flexibility", "growth", "adaptability", "serenity", "lightness"]
+    },
+    {
+        wood: "cherry",
+        tone: "Poetic—warm, affectionate, lightly lyrical",
+        keywords: ["warmth", "affection", "renewal", "harmony", "gentleness"]
+    }
+];
+
+// Function to get wood info by type
+function getWoodInfo(woodType) {
+    return woodInfo.find(info => info.wood === woodType) || woodInfo[1]; // Default to oak
+}
+
 // ===== DRAG & DROP INITIALIZATION =====
 
 // Initialize drag and drop functionality when DOM is loaded
@@ -328,6 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const palette = document.getElementById('palette');
     const paletteContainer = document.getElementById('palette-tiles');
     const slots = [...document.querySelectorAll('.slot')];
+    const messageArea = document.getElementById('message-area');
 
     // findTile and slotIsEmpty are now defined globally above
     
@@ -426,9 +468,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 10);
             } else {
                 // Standard move to empty slot
-                /* update palette */
-                const oldTile = findTile(w.dataset.tile);
-                oldTile && (oldTile.style.display = ''); // Make the tile visible again
+            /* update palette */
+            const oldTile = findTile(w.dataset.tile);
+            oldTile && (oldTile.style.display = ''); // Make the tile visible again
 
                 // Move the widget to the new slot
                 slot.appendChild(w);
@@ -512,6 +554,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         srcTile.style.display = 'none'; // Hide the tile completely
         saveLayout();
+
+        // Check if all slots are filled after drop
+        setTimeout(checkAllSlotsFilled, 300);
     }
     
     // Helper function to create a widget from a tile
@@ -612,6 +657,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Save the layout
             saveLayout();
         });
+
+        // Check if all slots are filled after removal
+        setTimeout(checkAllSlotsFilled, 500);
     });
 
     // No need to apply wood texture to tiles
@@ -623,12 +671,147 @@ document.addEventListener('DOMContentLoaded', async () => {
             panel.style.backgroundImage = `url(./assets/wood/${woodType}.jpg)`;
         }
     });
+
+    // Check if all slots are filled and reveal message if true
+    function checkAllSlotsFilled() {
+        const allFilled = slots.every(slot => !slotIsEmpty(slot));
+        
+        if (allFilled) {
+            revealWhisperMessage();
+        } else {
+            hideWhisperMessage();
+        }
+    }
+    
+    // Reveal the whisper message with animation
+    function revealWhisperMessage() {
+        if (!messageArea.classList.contains('revealed')) {
+            messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+            messageArea.classList.add('revealed');
+            
+            // Add click handler if not already added
+            if (!messageArea.dataset.listenerAdded) {
+                messageArea.addEventListener('click', handleWhisperClick);
+                messageArea.dataset.listenerAdded = 'true';
+            }
+        }
+    }
+    
+    // Hide the whisper message
+    function hideWhisperMessage() {
+        messageArea.classList.remove('revealed');
+        setTimeout(() => {
+            if (!messageArea.classList.contains('revealed')) {
+                messageArea.innerHTML = '';
+            }
+        }, 300);
+    }
+    
+    // Handle click on the whisper message
+    function handleWhisperClick() {
+        // Get the current wood type
+        const currentWoodType = window.getCurrentWoodType ? window.getCurrentWoodType() : 'oak';
+        const woodData = getWoodInfo(currentWoodType);
+        
+        // Structure to hold the keywords for each section
+        const sectionKeywords = {
+            beginning: [],
+            middle: [],
+            end: []
+        };
+        
+        // Function to get random items from an array
+        function getRandomItems(array, count) {
+            const shuffled = [...array].sort(() => Math.random() - 0.5);
+            return shuffled.slice(0, Math.min(count, shuffled.length));
+        }
+        
+        // Process each slot to collect keywords by position
+        slots.forEach(slot => {
+            if (!slotIsEmpty(slot)) {
+                const widget = slot.firstElementChild;
+                const tileType = widget.dataset.tile;
+                const tileModule = modules[tileType];
+                const slotNumber = parseInt(slot.dataset.slot);
+                
+                // Get all keywords from this tile module
+                const tileKeywords = (tileModule && tileModule.keywords) ? [...tileModule.keywords] : [];
+                
+                // Assign keywords to sections based on slot position
+                if (slotNumber === 1) {
+                    sectionKeywords.beginning.push(...tileKeywords);
+                } else if (slotNumber === 2) {
+                    sectionKeywords.middle.push(...tileKeywords);
+                } else if (slotNumber === 3) {
+                    sectionKeywords.end.push(...tileKeywords);
+                }
+            }
+        });
+        
+        // Add wood keywords to each section if needed to ensure we have content
+        if (woodData && woodData.keywords) {
+            const woodKeywords = [...woodData.keywords];
+            
+            // If any section is empty, add wood keywords to it
+            if (sectionKeywords.beginning.length === 0) sectionKeywords.beginning.push(...woodKeywords);
+            if (sectionKeywords.middle.length === 0) sectionKeywords.middle.push(...woodKeywords);
+            if (sectionKeywords.end.length === 0) sectionKeywords.end.push(...woodKeywords);
+        }
+        
+        // Create the data object with structured keywords, selecting 2 random keywords from each section
+        const whisperData = {
+            keywords: {
+                beginning: getRandomItems(sectionKeywords.beginning, 2),
+                middle: getRandomItems(sectionKeywords.middle, 2),
+                end: getRandomItems(sectionKeywords.end, 2)
+            },
+            tone: woodData.tone || "Balanced and reflective"
+        };
+        
+        // Log the whisper data to console (would be sent to an API in production)
+        console.log('Whisper Data:', whisperData);
+        
+        // Provide feedback to user
+        const originalText = messageArea.querySelector('span').textContent;
+        messageArea.innerHTML = '<span>Whisper sent...</span>';
+        
+        // Reset after a delay
+        setTimeout(() => {
+            if (messageArea.innerHTML === '<span>Whisper sent...</span>') {
+                messageArea.innerHTML = `<span>${originalText}</span>`;
+            }
+        }, 2000);
+        
+        // Dispatch a custom event that other parts of the app can listen for
+        document.dispatchEvent(new CustomEvent('whisperGenerated', {
+            detail: whisperData
+        }));
+    }
+    
+    // Check initial state after loading
+    setTimeout(checkAllSlotsFilled, 1000);
 });
 
-// Create and export tile registry
+// ===== TILE MODULES =====
+// Update once we come to that part of the file
+
+// Collection of tile modules
 export const modules = {
-    // Include all generated tiles
-    ...allModules
+    // Include all imported modules
+    ...allModules,
+    
+    // Sunrise is a special case tile
+    sunrise: {
+        id: 'sunrise',
+        label: 'Sunrise',
+        image: './assets/img/sunrise.svg',
+        wood: 'maple',
+        keywords: ['beginnings', 'hope', 'renewal', 'awakening', 'dawn'],
+        create() {
+            console.warn('Legacy create() method called for sunrise. Using SVG tile instead.');
+            return null;
+        }
+    }
 };
 
 // Listen for wood type changes - only apply to board, not tiles
@@ -648,7 +831,8 @@ window.Vibes = {
     modules,
     wood: {
         getCurrentType: () => window.getCurrentWoodType ? window.getCurrentWoodType() : 'oak',
-        setWood
+        setWood,
+        getInfo: getWoodInfo
     },
     audio: {
         init: initAudio,

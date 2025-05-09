@@ -7,8 +7,7 @@
   * Enhanced drag-and-drop with smooth transitions and animations
   * Expanded tile collection with 30+ mood and atmosphere options
   * Implemented wood-type based styling for consistent aesthetics
-  * Added intuitive slot swapping functionality for rearrangement
-  * Fixed tile appearance issues with improved dragging state handling
+  * Added interactive whisper message feature when three tiles are placed
 ================================================= -->
 
 <!doctype html>
@@ -18,21 +17,24 @@
     <meta charset="utf-8" />
     <title>Vibes Board</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cedarville+Cursive&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
     <style>
         /* Panel layout with 3 horizontal slots */
         #panel {
             grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: auto 1fr;
+            grid-template-rows: 1fr auto;
             grid-template-areas:
-                "message message message"
-                "slot1 slot2 slot3";
+                "slot1 slot2 slot3"
+                "message message message";
         }
         
         #message-area {
             grid-area: message;
-            min-height: 100px;
-            margin-bottom: 1.5rem;
+            min-height: 80px;
+            margin-top: 1.5rem;
         }
         
         /* Slot styling */

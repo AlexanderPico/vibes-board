@@ -96,6 +96,108 @@ button {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
+/* === MESSAGE AREA STYLING === */
+#message-area {
+    font-family: 'Cedarville Cursive', cursive;
+    color: var(--svg-oak-color); /* Default to oak, will be overridden */
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    right: 0;
+    transform: translateY(5px);
+    opacity: 0;
+    font-size: 2.2rem;
+    padding: 20px;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.35);
+    cursor: default;
+    z-index: 20;
+}
+
+#message-area::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, 
+        transparent 0%,
+        transparent calc(var(--writing-progress, 0%) - 5%),
+        var(--wood-url) calc(var(--writing-progress, 0%) + 5%),
+        var(--wood-url) 100%);
+    background-size: cover;
+    background-position: center;
+    mix-blend-mode: lighten;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#message-area > span {
+    position: relative;
+    z-index: 2;
+}
+
+#message-area.revealed {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    cursor: pointer;
+    animation: write-message 2s ease-out forwards;
+}
+
+#message-area.revealed:hover {
+    text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes write-message {
+    0% {
+        --writing-progress: 0%;
+    }
+    20% {
+        --writing-progress: 15%;
+    }
+    40% {
+        --writing-progress: 35%;
+    }
+    60% {
+        --writing-progress: 60%;
+    }
+    80% {
+        --writing-progress: 85%;
+    }
+    100% {
+        --writing-progress: 100%;
+    }
+}
+
+/* Wood type specific message colors - matches SVG styling */
+#panel[style*="bamboo.jpg"] #message-area {
+    color: var(--svg-bamboo-color);
+}
+
+#panel[style*="beech.jpg"] #message-area {
+    color: var(--svg-beech-color);
+}
+
+#panel[style*="cherry.jpg"] #message-area {
+    color: var(--svg-cherry-color);
+}
+
+#panel[style*="maple.jpg"] #message-area {
+    color: var(--svg-maple-color);
+}
+
+#panel[style*="oak.jpg"] #message-area {
+    color: var(--svg-oak-color);
+}
+
+#panel[style*="walnut.jpg"] #message-area {
+    color: var(--svg-walnut-color);
+}
+
 /* Slot styles */
 .slot {
     background: rgba(0, 0, 0, .2);
