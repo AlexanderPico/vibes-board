@@ -2,7 +2,7 @@
 
 ## ✨ Experience it live at [whispered-wisdom.netlify.app](https://whispered-wisdom.netlify.app/) ✨
 
-Whispered Wisdom is an interactive, wood-themed UI that lets you access an oracle of inspiration based on your current mood, struggles and desires. By placing tiles on the wooden board, you can create unique combinations that generate inspirational whispered messages tailored to your selection. The choice of wood for the background board determines teh tone of the message.
+Whispered Wisdom is an interactive, wood-themed UI that lets you access an oracle of inspiration based on your current mood, struggles and desires. By placing tiles on the wooden board, you can create unique combinations that generate inspirational whispered messages tailored to your selection. The choice of wood for the background board determines the tone of the message.
 
 ## How to Use
 
