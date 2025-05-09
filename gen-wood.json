@@ -1,68 +1,26 @@
 [
     {
         "wood": "maple",
-        "tone": "Motivational—upbeat and forward‑looking",
-        "keywords": [
-            "warmth",
-            "clarity",
-            "uplift",
-            "freshness",
-            "positivity"
-        ]
+        "tone": "Motivational—upbeat, forward‑looking and witty"
     },
     {
         "wood": "oak",
-        "tone": "Stoic—steady, authoritative, classical rhetoric",
-        "keywords": [
-            "strength",
-            "steadfastness",
-            "tradition",
-            "endurance",
-            "reliability"
-        ]
+        "tone": "Practical, realistic, but with some levity"
     },
     {
         "wood": "walnut",
-        "tone": "Introspective—deep, contemplative, quietly powerful",
-        "keywords": [
-            "depth",
-            "contemplation",
-            "wisdom",
-            "resilience",
-            "mystery"
-        ]
+        "tone": "Introspective—deep, contemplative, quietly powerful"
     },
     {
         "wood": "beech",
-        "tone": "Mindful—calm, balanced, reflective, gentle guidance",
-        "keywords": [
-            "calm",
-            "neutrality",
-            "reflection",
-            "acceptance",
-            "balance"
-        ]
+        "tone": "Mindful—calm, balanced, reflective, gentle guidance"
     },
     {
         "wood": "bamboo",
-        "tone": "Eastern‑philosophical—Confucian/Taoist simplicity and harmony, haiku-like",
-        "keywords": [
-            "flexibility",
-            "growth",
-            "adaptability",
-            "serenity",
-            "lightness"
-        ]
+        "tone": "Eastern‑philosophical—Confucian/Taoist simplicity and harmony, haiku-like"
     },
     {
         "wood": "cherry",
-        "tone": "Poetic—warm, affectionate, lightly lyrical",
-        "keywords": [
-            "warmth",
-            "affection",
-            "renewal",
-            "harmony",
-            "gentleness"
-        ]
+        "tone": "Affectionate, lightly lyrical, and funny"
     }
 ]

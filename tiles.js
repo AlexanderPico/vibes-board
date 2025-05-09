@@ -510,49 +510,42 @@ async function loadLayout(slots) {
 
 // ===== WOOD INFORMATION =====
 
-// Define wood types with tone and keywords - will be used for generating whispers
-const woodInfo = [
-    {
-        wood: "maple",
-        tone: "Motivational—upbeat and forward‑looking",
-        keywords: ["warmth", "clarity", "uplift", "freshness", "positivity"]
-    },
-    {
-        wood: "oak",
-        tone: "Stoic—steady, authoritative, classical rhetoric",
-        keywords: ["strength", "steadfastness", "tradition", "endurance", "reliability"]
-    },
-    {
-        wood: "walnut",
-        tone: "Introspective—deep, contemplative, quietly powerful",
-        keywords: ["depth", "contemplation", "wisdom", "resilience", "mystery"]
-    },
-    {
-        wood: "beech",
-        tone: "Mindful—calm, balanced, reflective, gentle guidance",
-        keywords: ["calm", "neutrality", "reflection", "acceptance", "balance"]
-    },
-    {
-        wood: "bamboo",
-        tone: "Eastern‑philosophical—Confucian/Taoist simplicity and harmony, haiku-like",
-        keywords: ["flexibility", "growth", "adaptability", "serenity", "lightness"]
-    },
-    {
-        wood: "cherry",
-        tone: "Poetic—warm, affectionate, lightly lyrical",
-        keywords: ["warmth", "affection", "renewal", "harmony", "gentleness"]
+// Load wood types from JSON file - will be used for generating whispers
+let woodInfo = [];
+
+// Function to load wood info from JSON
+async function loadWoodInfo() {
+    try {
+        const response = await fetch('./gen-wood.json');
+        if (!response.ok) {
+            throw new Error('Failed to load wood information');
+        }
+        woodInfo = await response.json();
+        console.log('Wood information loaded successfully');
+    } catch (error) {
+        console.error('Error loading wood information:', error);
+        // Fallback to default oak if loading fails
+        woodInfo = [
+            {
+                wood: "maple",
+                tone: "Motivational—upbeat, forward‑looking and witty"
+            }
+        ];
     }
-];
+}
 
 // Function to get wood info by type
 function getWoodInfo(woodType) {
-    return woodInfo.find(info => info.wood === woodType) || woodInfo[1]; // Default to oak
+    return woodInfo.find(info => info.wood === woodType) || woodInfo[1] || woodInfo[0]; // Default to oak or first available
 }
 
 // ===== DRAG & DROP INITIALIZATION =====
 
 // Initialize drag and drop functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
+    // Load wood information first
+    await loadWoodInfo();
+    
     // DOM refs
     const palette = document.getElementById('palette');
     const paletteContainer = document.getElementById('palette-tiles');
@@ -999,16 +992,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
         
-        // Add wood keywords to each section if needed to ensure we have content
-        if (woodData && woodData.keywords) {
-            const woodKeywords = [...woodData.keywords];
-            
-            // If any section is empty, add wood keywords to it
-            if (sectionKeywords.beginning.length === 0) sectionKeywords.beginning.push(...woodKeywords);
-            if (sectionKeywords.middle.length === 0) sectionKeywords.middle.push(...woodKeywords);
-            if (sectionKeywords.end.length === 0) sectionKeywords.end.push(...woodKeywords);
-        }
-        
         // Get 2 random keywords from each section
         const selectedKeywords = {
             beginning: getRandomItems(sectionKeywords.beginning, 2),
@@ -1022,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const endStr = selectedKeywords.end.join(" and ");
         
         // Create the human-readable instruction for the LLM prompt
-        const userContent = `In a ${woodData.tone || "balanced and reflective"} tone, provide an inspirational quote for someone experiencing a journey from ${beginningStr} through ${middleStr} to ${endStr}.`;
+        const userContent = `In a ${woodData.tone || "inspirational"} tone, provide an inspirational quote for someone experiencing a journey from ${beginningStr} through ${middleStr} to ${endStr}.`;
         
         // Create the complete LLM request payload
         const whisperData = {
