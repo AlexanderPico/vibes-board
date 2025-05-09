@@ -656,12 +656,33 @@ button {
         touch-action: none;
         -webkit-user-select: none;
         user-select: none;
+        min-height: 60px; /* Ensure minimum size on mobile */
     }
     
     /* Ensure drag-over state is clearly visible on mobile */
     .slot.drag-over {
         outline: 4px dashed #fff;
         background-color: rgba(255, 255, 255, 0.25);
+        transform: scale(1.05);
+    }
+    
+    /* Make panel layout more compact for mobile */
+    #panel {
+        margin-left: 10px;
+        margin-right: 10px;
+        max-width: calc(100vw - 20px);
+        height: auto;
+        min-height: 350px;
+    }
+    
+    /* Adjust palette for mobile */
+    #palette {
+        z-index: 1000; /* Ensure it's above other elements */
+    }
+    
+    /* Improve touch targets */
+    .tile, .widget {
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
     }
 }
 
