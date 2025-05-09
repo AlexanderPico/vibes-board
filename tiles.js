@@ -221,6 +221,8 @@ function slotIsEmpty(slot) {
     // Make an element draggable
     function makeDraggable(node, type) {
         node.draggable = true;
+        
+        // Standard drag events for desktop
         node.addEventListener('dragstart', e => {
             e.dataTransfer.setData('widgetId', node.id);   // present for existing widgets
             e.dataTransfer.setData('tile', type);      // always present
@@ -231,28 +233,157 @@ function slotIsEmpty(slot) {
             }, 0);
         });
         
-    node.addEventListener('dragend', e => {
-        // Immediately remove the dragging class to end the tilt effect
-        node.classList.remove('dragging');
-        
-        // Only affect widgets, not tiles
-        if (node.classList.contains('widget')) {
-            // Force a style reset after a short delay to ensure transitions complete
-            setTimeout(() => {
-                // Additional safety check to ensure dragging class is gone
+        node.addEventListener('dragend', e => {
+            // Immediately remove the dragging class to end the tilt effect
             node.classList.remove('dragging');
-                
-                // Only reset if not in any special state
-                if (!node.classList.contains('dragging') && !node.classList.contains('lifting')) {
-                    // Clear any inline transform styles that might be lingering
-                    if (node.style.transform && node.style.transform !== 'none') {
-                        node.style.transform = 'none';
+            
+            // Only affect widgets, not tiles
+            if (node.classList.contains('widget')) {
+                // Force a style reset after a short delay to ensure transitions complete
+                setTimeout(() => {
+                    // Additional safety check to ensure dragging class is gone
+                node.classList.remove('dragging');
+                    
+                    // Only reset if not in any special state
+                    if (!node.classList.contains('dragging') && !node.classList.contains('lifting')) {
+                        // Clear any inline transform styles that might be lingering
+                        if (node.style.transform && node.style.transform !== 'none') {
+                            node.style.transform = 'none';
+                        }
                     }
+                }, 50);
+            }
+        });
+        
+        // Touch events for mobile
+        let touchStartX, touchStartY;
+        let targetSlot = null;
+        
+        node.addEventListener('touchstart', e => {
+            // Store initial touch position
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            
+            // Add dragging class for visual feedback
+            setTimeout(() => {
+                node.classList.add('dragging');
+                // Add class to body to prevent scrolling on mobile
+                document.body.classList.add('is-dragging');
+            }, 0);
+            
+            // Initialize audio if it's the first interaction
+            initAudio();
+            
+            // Prevent default to avoid scrolling while dragging
+            e.preventDefault();
+        }, { passive: false });
+        
+        node.addEventListener('touchmove', e => {
+            if (!node.classList.contains('dragging')) return;
+            
+            // Get current touch position
+            const touchX = e.touches[0].clientX;
+            const touchY = e.touches[0].clientY;
+            
+            // Find slot elements under the touch point
+            const elementsUnderTouch = document.elementsFromPoint(touchX, touchY);
+            const slotUnderTouch = elementsUnderTouch.find(el => el.classList.contains('slot'));
+            
+            // Update the target slot
+            if (slotUnderTouch !== targetSlot) {
+                // Remove highlighting from previous target slot
+                if (targetSlot) {
+                    targetSlot.classList.remove('drag-over');
                 }
-            }, 50);
-        }
-    });
-}
+                
+                // Add highlighting to new target slot if it's empty
+                if (slotUnderTouch && slotIsEmpty(slotUnderTouch)) {
+                    slotUnderTouch.classList.add('drag-over');
+                }
+                
+                targetSlot = slotUnderTouch;
+            }
+            
+            // Prevent default to avoid scrolling while dragging
+            e.preventDefault();
+        }, { passive: false });
+        
+        node.addEventListener('touchend', e => {
+            // Remove dragging class
+            node.classList.remove('dragging');
+            // Remove scrolling prevention
+            document.body.classList.remove('is-dragging');
+            
+            // Handle drop on slot if we have a target
+            if (targetSlot) {
+                targetSlot.classList.remove('drag-over');
+                
+                // Create a simulated drop event with the necessary data
+                const simulatedEvent = new Event('drop');
+                simulatedEvent.preventDefault = () => {};
+                
+                // Create a simulated dataTransfer object
+                const dataTransfer = {
+                    data: {},
+                    setData: function(key, value) { this.data[key] = value; },
+                    getData: function(key) { return this.data[key]; }
+                };
+                
+                // Set the data for the simulated drop event
+                dataTransfer.setData('widgetId', node.id);
+                dataTransfer.setData('tile', type);
+                simulatedEvent.dataTransfer = dataTransfer;
+                
+                // Handle the drop
+                handleSlotDrop(simulatedEvent, targetSlot);
+            }
+            
+            // Handle drop on palette (removing tile)
+            const elementsUnderTouch = document.elementsFromPoint(
+                e.changedTouches[0].clientX, 
+                e.changedTouches[0].clientY
+            );
+            const isPaletteUnderTouch = elementsUnderTouch.some(el => 
+                el.id === 'palette' || el.closest('#palette')
+            );
+            
+            if (isPaletteUnderTouch && node.classList.contains('widget')) {
+                // Create a simulated drop event for the palette
+                const simulatedEvent = new Event('drop');
+                simulatedEvent.preventDefault = () => {};
+                
+                // Create a simulated dataTransfer object
+                const dataTransfer = {
+                    data: {},
+                    setData: function(key, value) { this.data[key] = value; },
+                    getData: function(key) { return this.data[key]; }
+                };
+                
+                // Set the data for the simulated drop event
+                dataTransfer.setData('widgetId', node.id);
+                dataTransfer.setData('tile', type);
+                simulatedEvent.dataTransfer = dataTransfer;
+                
+                // Get the palette element and dispatch the event
+                const palette = document.getElementById('palette');
+                palette.dispatchEvent(simulatedEvent);
+            }
+            
+            // Clear target slot
+            targetSlot = null;
+            
+            // Reset any lingering styles on mobile
+            if (node.classList.contains('widget')) {
+                setTimeout(() => {
+                    if (!node.classList.contains('dragging') && !node.classList.contains('lifting')) {
+                        if (node.style.transform && node.style.transform !== 'none') {
+                            node.style.transform = 'none';
+                        }
+                    }
+                }, 50);
+            }
+        });
+    }
 
 // ===== LAYOUT PERSISTENCE =====
 
@@ -436,8 +567,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Handle dropping a widget onto a slot
     function handleSlotDrop(e, slot) {
         e.preventDefault();
-        const type = e.dataTransfer.getData('tile');
-        const widId = e.dataTransfer.getData('widgetId');
+        // For both standard and simulated events
+        const type = e.dataTransfer?.getData('tile');
+        const widId = e.dataTransfer?.getData('widgetId');
 
         // Check if the slot is already occupied
         const existingWidget = slot.firstElementChild;
@@ -624,7 +756,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     palette.addEventListener('dragover', e => e.preventDefault());
     palette.addEventListener('drop', e => {
         e.preventDefault();
-        const widId = e.dataTransfer.getData('widgetId');
+        // For both standard and simulated events
+        const widId = e.dataTransfer?.getData('widgetId');
         if (!widId) return;
 
         const w = document.getElementById(widId);

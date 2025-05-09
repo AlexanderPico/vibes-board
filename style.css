@@ -7,8 +7,8 @@
     /* Wood-specific SVG styling */
     --svg-maple-color: rgba(70, 30, 5, 0.85);
     --svg-oak-color: rgba(60, 35, 10, 0.8);
-    --svg-cherry-color: rgba(85, 25, 20, 0.85);
-    --svg-walnut-color: rgba(50, 30, 15, 0.9);
+    --svg-cherry-color: rgba(59, 17, 14, 0.85);
+    --svg-walnut-color: rgba(21, 13, 6, 0.9);
     --svg-beech-color: rgba(80, 55, 30, 0.8);
     --svg-bamboo-color: rgba(45, 60, 20, 0.8);
 }
@@ -641,5 +641,27 @@ button {
 #message-area.error-message {
     max-height: 120px; /* Even more space for error messages */
     font-size: 1.8rem; /* Slightly smaller text to fit more content */
+}
+
+/* Mobile-friendly enhancements */
+@media (max-width: 768px) {
+    /* Prevent scrolling when dragging */
+    body.is-dragging {
+        overflow: hidden;
+        touch-action: none;
+    }
+    
+    /* Increase touch targets */
+    .tile {
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Ensure drag-over state is clearly visible on mobile */
+    .slot.drag-over {
+        outline: 4px dashed #fff;
+        background-color: rgba(255, 255, 255, 0.25);
+    }
 }
 
