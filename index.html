@@ -1,13 +1,8 @@
 <!-- =================================================
-  Vibes Board – Interactive Wood Burned UI (v0.4)
-  2023-10-02
-  * Implemented consistent styling between tiles and widgets
-  * Added burned wood SVG effect for a natural carved appearance
-  * Removed text labels for a cleaner minimal interface
-  * Enhanced drag-and-drop with smooth transitions and animations
-  * Expanded tile collection with 30+ mood and atmosphere options
-  * Implemented wood-type based styling for consistent aesthetics
+  Whisphered Wisdom – Interactive Wooden Oracle(v1.0)
+  2025-05-08
   * Added interactive whisper message feature when three tiles are placed
+  * Fixed message display to ensure text is never truncated
 ================================================= -->
 
 <!doctype html>
@@ -15,7 +10,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Vibes Board</title>
+    <title>Whisphered Wisdom</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,8 +28,12 @@
         
         #message-area {
             grid-area: message;
-            min-height: 80px;
+            min-height: 100px;
             margin-top: 1.5rem;
+            /* Dark mode resistance */
+            background-color: transparent !important;
+            background: transparent !important;
+            color: inherit !important;
         }
         
         /* Slot styling */

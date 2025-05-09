@@ -686,7 +686,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Reveal the whisper message with animation
     function revealWhisperMessage() {
         if (!messageArea.classList.contains('revealed')) {
-            // Make sure the message has the right content and structure
+            // Reset all special classes and make sure the message has the right content and structure
+            messageArea.classList.remove('long-quote', 'very-long-quote', 'error-message');
+            
             if (!messageArea.querySelector('span')) {
                 messageArea.innerHTML = '<span>Whisper into the wind...</span>';
             }
@@ -703,12 +705,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Hide the whisper message
     function hideWhisperMessage() {
-        messageArea.classList.remove('revealed');
+        messageArea.classList.remove('revealed', 'long-quote', 'very-long-quote', 'error-message');
         
         // Keep the content structure intact but hide it
         if (!messageArea.querySelector('span')) {
             messageArea.innerHTML = '<span>Whisper into the wind...</span>';
         }
+    }
+    
+    // Add this function before handleWhisperClick
+    function applyQuoteFormatting(element, text) {
+        // Reset classes first
+        element.classList.remove('long-quote', 'very-long-quote');
+        
+        // Apply appropriate class based on length
+        if (text.length > 80 && text.length <= 120) {
+            element.classList.add('long-quote');
+        } else if (text.length > 120) {
+            element.classList.add('very-long-quote');
+        }
+        
+        return element;
     }
     
     // Handle click on the whisper message
@@ -783,7 +800,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             "messages": [
                 {
                     "role": "system",
-                    "content": "You author short, uplifting quotes relevant to the user's journey. Each response must be one self‑contained sentence or poem, ≤ 120 characters, with no prefatory text or styling."
+                    "content": "You author short, uplifting quotes relevant to the user's journey. Each response must be one self‑contained sentence or poem, ≤80 characters, with no prefatory text or styling."
                 },
                 {
                     "role": "user",
@@ -798,7 +815,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Show loading state
         const originalText = messageArea.querySelector('span').textContent;
-        messageArea.innerHTML = '<span>Sending whisper...</span>';
+        messageArea.innerHTML = '<span>Listening for a response...</span>';
         
         // Send the whisper data to our Netlify function
         async function sendWhisperToGroq() {
@@ -825,24 +842,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 // Display the quote in the message area
                 if (data.quote) {
+                    // Apply formatting based on quote length
+                    applyQuoteFormatting(messageArea, data.quote);
+                    
                     messageArea.innerHTML = `<span>${data.quote}</span>`;
                     
                     // After displaying quote, add click handler to reset
                     messageArea.addEventListener('click', () => {
+                        // Reset classes when going back to original message
+                        messageArea.classList.remove('long-quote', 'very-long-quote');
                         messageArea.innerHTML = `<span>${originalText}</span>`;
                     }, { once: true });
                 } else {
                     // Fallback if no quote is returned
+                    messageArea.classList.remove('long-quote', 'very-long-quote');
                     messageArea.innerHTML = `<span>${originalText}</span>`;
                 }
             } catch (error) {
                 console.error('Error sending whisper:', error);
-                messageArea.innerHTML = `<span>Whisper echoed into silence...</span>`;
+                // Apply the error-message class for better error message display
+                messageArea.classList.remove('long-quote', 'very-long-quote');
+                messageArea.classList.add('error-message');
+                messageArea.innerHTML = `<span>Whisper echoed into silence...<br>(try again later)</span>`;
                 
                 // Reset after a delay
                 setTimeout(() => {
+                    messageArea.classList.remove('error-message');
                     messageArea.innerHTML = `<span>${originalText}</span>`;
-                }, 3000);
+                }, 6000);
             }
         }
         
