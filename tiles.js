@@ -758,14 +758,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (sectionKeywords.end.length === 0) sectionKeywords.end.push(...woodKeywords);
         }
         
-        // Create the data object with structured keywords, selecting 2 random keywords from each section
+        // Get 2 random keywords from each section
+        const selectedKeywords = {
+            beginning: getRandomItems(sectionKeywords.beginning, 2),
+            middle: getRandomItems(sectionKeywords.middle, 2),
+            end: getRandomItems(sectionKeywords.end, 2)
+        };
+        
+        // Format keywords as comma-separated strings for each section
+        const beginningStr = selectedKeywords.beginning.join(" and ");
+        const middleStr = selectedKeywords.middle.join(" and ");
+        const endStr = selectedKeywords.end.join(" and ");
+        
+        // Create the human-readable instruction for the LLM prompt
+        const userContent = `In a ${woodData.tone || "balanced and reflective"} tone, provide an inspirational quote for someone experiencing a journey from ${beginningStr} through ${middleStr} to ${endStr}.`;
+        
+        // Create the complete LLM request payload
         const whisperData = {
-            keywords: {
-                beginning: getRandomItems(sectionKeywords.beginning, 2),
-                middle: getRandomItems(sectionKeywords.middle, 2),
-                end: getRandomItems(sectionKeywords.end, 2)
-            },
-            tone: woodData.tone || "Balanced and reflective"
+            "model": "llama3-70b-8192",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You author short, uplifting quotes relevant to the user's journey. Each response must be one self‑contained sentence or poem, ≤ 120 characters, with no prefatory text or styling."
+                },
+                {
+                    "role": "user",
+                    "content": userContent
+                }
+            ],
+            "temperature": 0.9,
+            "max_tokens": 60,
+            "top_p": 0.85,
+            "presence_penalty": 0.2
         };
         
         // Log the whisper data to console (would be sent to an API in production)
