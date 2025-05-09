@@ -686,7 +686,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Reveal the whisper message with animation
     function revealWhisperMessage() {
         if (!messageArea.classList.contains('revealed')) {
-            messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+            // Make sure the message has the right content and structure
+            if (!messageArea.querySelector('span')) {
+                messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+            }
+            
             messageArea.classList.add('revealed');
             
             // Add click handler if not already added
@@ -700,11 +704,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Hide the whisper message
     function hideWhisperMessage() {
         messageArea.classList.remove('revealed');
-        setTimeout(() => {
-            if (!messageArea.classList.contains('revealed')) {
-                messageArea.innerHTML = '';
-            }
-        }, 300);
+        
+        // Keep the content structure intact but hide it
+        if (!messageArea.querySelector('span')) {
+            messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+        }
     }
     
     // Handle click on the whisper message
