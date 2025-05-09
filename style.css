@@ -643,12 +643,12 @@ button {
 }
 
 /* Border colors for different wood types */
-.tile[data-wood="oak"], .widget[data-wood="oak"] { border-color: #e19757; }
-.tile[data-wood="maple"], .widget[data-wood="maple"] { border-color: #bb9b7c; }
-.tile[data-wood="cherry"], .widget[data-wood="cherry"] { border-color: #471f1b; }
-.tile[data-wood="walnut"], .widget[data-wood="walnut"] { border-color: #4a351f; }
-.tile[data-wood="beech"], .widget[data-wood="beech"] { border-color: #d7bc91; }
-.tile[data-wood="bamboo"], .widget[data-wood="bamboo"] { border-color: #b1824a; }
+.tile[data-wood="oak"], .widget[data-wood="oak"] { border-color: #ea9059; }
+.tile[data-wood="maple"], .widget[data-wood="maple"] { border-color: #e6b890; }
+.tile[data-wood="cherry"], .widget[data-wood="cherry"] { border-color: #73380c; }
+.tile[data-wood="walnut"], .widget[data-wood="walnut"] { border-color: #491e08; }
+.tile[data-wood="beech"], .widget[data-wood="beech"] { border-color: #a48357; }
+.tile[data-wood="bamboo"], .widget[data-wood="bamboo"] { border-color: #c58d4b; }
 
 /* Adjust texture zoom/resolution */
 .tile[data-wood="bamboo"], .widget[data-wood="bamboo"], .texture-dot[data-wood="bamboo"] { 
