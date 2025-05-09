@@ -913,9 +913,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         element.classList.remove('long-quote', 'very-long-quote');
         
         // Apply appropriate class based on length
-        if (text.length > 80 && text.length <= 120) {
+        if (text.length > 70 && text.length <= 100) {
             element.classList.add('long-quote');
-        } else if (text.length > 120) {
+        } else if (text.length > 100) {
             element.classList.add('very-long-quote');
         }
         

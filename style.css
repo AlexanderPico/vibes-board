@@ -101,13 +101,13 @@ button {
     font-family: 'Cedarville Cursive', cursive;
     color: var(--svg-oak-color); /* Default to oak, will be overridden */
     position: absolute;
-    bottom: 15px;
+    bottom: 25px; /* Increased from 15px to move up */
     left: 0;
     right: 0;
     transform: translateY(5px);
     opacity: 0;
     font-size: 2.2rem;
-    padding: 20px 20px 30px 20px; /* Increased bottom padding */
+    padding: 20px 20px 40px 20px; /* Increased bottom padding from 30px to 40px */
     text-align: center;
     pointer-events: none;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
@@ -121,7 +121,7 @@ button {
     -webkit-text-fill-color: var(--svg-oak-color);
     max-width: 90%;
     margin: 0 auto;
-    max-height: 100px; /* Increased from 80px to 100px */
+    max-height: 120px; /* Increased from 100px to 120px */
     overflow: hidden; /* Hide overflow text */
 }
 
@@ -168,12 +168,13 @@ button {
 
 /* For longer quotes, reduce the font size */
 #message-area.long-quote {
-    font-size: 1.8rem;
+    font-size: 1.7rem;
+    line-height: 1;
 }
 
 /* For even longer quotes, reduce more */
 #message-area.very-long-quote {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     line-height: 0.9;
 }
 
