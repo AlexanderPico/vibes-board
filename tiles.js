@@ -912,7 +912,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Reset to initial state
         messageArea.classList.remove('long-quote', 'very-long-quote', 'error-message');
-        messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+        messageArea.innerHTML = '<span class="whisper-text">Whisper into the wind...</span>';
         
         // Show the message
         messageArea.classList.add('revealed');
@@ -930,7 +930,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         messageArea.classList.remove('revealed', 'long-quote', 'very-long-quote', 'error-message');
         
         // Reset the content to the default
-        messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+        messageArea.innerHTML = '<span class="whisper-text">Whisper into the wind...</span>';
         
         // Remove any click event handlers
         if (messageArea.dataset.listenerAdded === 'true') {
@@ -1102,12 +1102,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Apply the error-message class for better error message display
                 messageArea.classList.remove('long-quote', 'very-long-quote');
                 messageArea.classList.add('error-message');
-                messageArea.innerHTML = `<span>Your whisper echoed into silence...<br>(try again later)</span>`;
+                messageArea.innerHTML = `<span>Your whisper echoes into silence...<br><br>(Please try again later)</span>`;
                 
                 // Reset after a delay
                 setTimeout(() => {
                     messageArea.classList.remove('error-message');
-                    messageArea.innerHTML = `<span>${originalText}</span>`;
+                    messageArea.innerHTML = `<span class="whisper-text">${originalText}</span>`;
                     
                     // Re-add the standard whisper click handler
                     if (messageArea.dataset.listenerAdded !== 'true') {

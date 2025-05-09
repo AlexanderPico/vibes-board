@@ -7,7 +7,7 @@
     /* Wood-specific SVG styling */
     --svg-maple-color: rgba(70, 30, 5, 0.85);
     --svg-oak-color: rgba(60, 35, 10, 0.8);
-    --svg-cherry-color: rgba(59, 17, 14, 0.85);
+    --svg-cherry-color: rgba(48, 10, 7, 0.85);
     --svg-walnut-color: rgba(21, 13, 6, 0.9);
     --svg-beech-color: rgba(80, 55, 30, 0.8);
     --svg-bamboo-color: rgba(45, 60, 20, 0.8);
@@ -187,6 +187,11 @@ button {
     background: transparent !important;
 }
 
+/* Apply glow animation only to the default whisper message */
+#message-area.revealed .whisper-text {
+    animation: whisper-glow 2s ease-in-out infinite;
+}
+
 #message-area.revealed:hover {
     text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.5);
 }
@@ -209,6 +214,19 @@ button {
     }
     100% {
         --writing-progress: 100%;
+    }
+}
+
+/* Add whisper glow animation */
+@keyframes whisper-glow {
+    0% {
+        text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.3);
+    }
+    50% {
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.7), 0 0 15px rgba(255, 255, 255, 0.4);
+    }
+    100% {
+        text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.3);
     }
 }
 
@@ -628,7 +646,7 @@ button {
 /* Border colors for different wood types */
 .tile[data-wood="oak"], .widget[data-wood="oak"] { border-color: #e19757; }
 .tile[data-wood="maple"], .widget[data-wood="maple"] { border-color: #bb9b7c; }
-.tile[data-wood="cherry"], .widget[data-wood="cherry"] { border-color: #8e443d; }
+.tile[data-wood="cherry"], .widget[data-wood="cherry"] { border-color: #471f1b; }
 .tile[data-wood="walnut"], .widget[data-wood="walnut"] { border-color: #4a351f; }
 .tile[data-wood="beech"], .widget[data-wood="beech"] { border-color: #d7bc91; }
 .tile[data-wood="bamboo"], .widget[data-wood="bamboo"] { border-color: #b1824a; }
@@ -640,8 +658,8 @@ button {
 
 /* For multi-line error messages */
 #message-area.error-message {
-    max-height: 120px; /* Even more space for error messages */
-    font-size: 1.8rem; /* Slightly smaller text to fit more content */
+    max-height: 100px; /* Even more space for error messages */
+    font-size: 2rem; /* Slightly smaller text to fit more content */
 }
 
 /* Mobile-friendly enhancements */

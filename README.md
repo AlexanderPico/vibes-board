@@ -76,6 +76,8 @@ This project was developed using AI pair programming:
   - CSS animations and styling
   - Bug fixes and display optimizations
 
+ 🙏 And special thanks to [AI Advantage](https://community.myaiadvantage.com) for the Community Challenge 
+
 ### File Structure
 
 - `index.html` - Main application structure and layout
