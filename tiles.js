@@ -682,8 +682,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             saveLayout();
             
-            // Check if all slots are filled after the widget is moved
-            setTimeout(checkAllSlotsFilled, 300);
+            // Immediately check if all slots are filled after the widget is moved
+            // Don't use setTimeout to prevent race conditions
+            checkAllSlotsFilled();
             
             return;
         }
@@ -723,8 +724,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             saveLayout();
             
-            // Check if all slots are filled after the widget is moved
-            setTimeout(checkAllSlotsFilled, 300);
+            // Immediately check if all slots are filled after the widget is moved
+            // Don't use setTimeout to prevent race conditions
+            checkAllSlotsFilled();
             
             return;
         }
@@ -752,8 +754,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         srcTile.style.display = 'none'; // Hide the tile completely
         saveLayout();
 
-        // Check if all slots are filled after drop
-        setTimeout(checkAllSlotsFilled, 300);
+        // Immediately check if all slots are filled after drop
+        // Don't use setTimeout to prevent race conditions
+        checkAllSlotsFilled();
     }
     
     // Helper function to create a widget from a tile
@@ -879,31 +882,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     function checkAllSlotsFilled() {
         const allFilled = slots.every(slot => !slotIsEmpty(slot));
         
-        if (allFilled) {
-            revealWhisperMessage();
-        } else {
+        // If a quote was shown and tiles were moved or removed, always reset the message 
+        // first to ensure we have a consistent state
+        if (messageArea.dataset.quoteShown === 'true') {
             hideWhisperMessage();
+            messageArea.dataset.quoteShown = 'false';
+            
+            // If slots are still filled, reveal the whisper message again after a brief delay
+            if (allFilled) {
+                setTimeout(revealWhisperMessage, 50);
+                return;
+            }
+        } else {
+            // Standard behavior
+            if (allFilled) {
+                revealWhisperMessage();
+            } else {
+                hideWhisperMessage();
+            }
         }
     }
     
     // Reveal the whisper message with animation
     function revealWhisperMessage() {
-        if (!messageArea.classList.contains('revealed')) {
-            // Reset all special classes and make sure the message has the right content and structure
-            messageArea.classList.remove('long-quote', 'very-long-quote', 'error-message');
-            
-            if (!messageArea.querySelector('span')) {
-                messageArea.innerHTML = '<span>Whisper into the wind...</span>';
-            }
-            
-            messageArea.classList.add('revealed');
-            
-            // Add click handler if not already added
-            if (!messageArea.dataset.listenerAdded) {
-                messageArea.addEventListener('click', handleWhisperClick);
-                messageArea.dataset.listenerAdded = 'true';
-            }
+        // Clear any existing event listeners first
+        if (messageArea.dataset.listenerAdded === 'true') {
+            messageArea.removeEventListener('click', handleWhisperClick);
         }
+        
+        // Reset to initial state
+        messageArea.classList.remove('long-quote', 'very-long-quote', 'error-message');
+        messageArea.innerHTML = '<span>Whisper into the wind...</span>';
+        
+        // Show the message
+        messageArea.classList.add('revealed');
+        messageArea.style.transform = 'translateY(0)';
+        messageArea.style.opacity = '1';
+        
+        // Add click handler 
+        messageArea.addEventListener('click', handleWhisperClick);
+        messageArea.dataset.listenerAdded = 'true';
     }
     
     // Hide the whisper message
@@ -915,9 +933,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         messageArea.innerHTML = '<span>Whisper into the wind...</span>';
         
         // Remove any click event handlers
-        if (messageArea.dataset.listenerAdded) {
+        if (messageArea.dataset.listenerAdded === 'true') {
             messageArea.removeEventListener('click', handleWhisperClick);
-            delete messageArea.dataset.listenerAdded;
+            messageArea.dataset.listenerAdded = 'false';
         }
         
         // Reset any inline styles that might have been applied
@@ -1059,16 +1077,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     messageArea.innerHTML = `<span>${data.quote}</span>`;
                     
-                    // After displaying quote, add click handler to reset
+                    // Remove the standard whisper click handler while showing quote
+                    messageArea.removeEventListener('click', handleWhisperClick);
+                    
+                    // After displaying quote, add one-time click handler to reset
                     messageArea.addEventListener('click', () => {
-                        // Reset classes when going back to original message
-                        messageArea.classList.remove('long-quote', 'very-long-quote');
-                        messageArea.innerHTML = `<span>${originalText}</span>`;
+                        // Reset the whisper state completely, then reveal again
+                        hideWhisperMessage();
+                        setTimeout(revealWhisperMessage, 10);
                     }, { once: true });
+                    
+                    // Set a flag to indicate we're in "quote shown" state
+                    messageArea.dataset.quoteShown = 'true';
                 } else {
                     // Fallback if no quote is returned
                     messageArea.classList.remove('long-quote', 'very-long-quote');
                     messageArea.innerHTML = `<span>${originalText}</span>`;
+                    
+                    // Reset listener state
+                    messageArea.dataset.listenerAdded = 'true';
                 }
             } catch (error) {
                 console.error('Error sending whisper:', error);
@@ -1081,6 +1108,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => {
                     messageArea.classList.remove('error-message');
                     messageArea.innerHTML = `<span>${originalText}</span>`;
+                    
+                    // Re-add the standard whisper click handler
+                    if (messageArea.dataset.listenerAdded !== 'true') {
+                        messageArea.addEventListener('click', handleWhisperClick);
+                        messageArea.dataset.listenerAdded = 'true';
+                    }
                 }, 6000);
             }
         }
