@@ -955,17 +955,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     function convertToSmartQuotes(text) {
         if (!text) return text;
         
-        // Use Unicode escape sequences for curly quotes
-        // Left double quote: \u201C
-        // Right double quote: \u201D
-        // Left single quote: \u2018
-        // Right single quote: \u2019
+        // First, trim any whitespace
+        let result = text.trim();
         
-        // Simple approach - replace all double quotes with right double curly quotes
-        let result = text.replace(/"/g, "\u201D");
+        // Remove any quotes (straight or curly) from beginning and end
+        result = result.replace(/^["'"']/, '').replace(/["'"']$/, '');
         
-        // Replace all single quotes with right single curly quotes
-        result = result.replace(/'/g, "\u2019");
+        // Add proper smart quotes around the entire text
+        result = "\u201C" + result + "\u201D"; // Left double quote at start, right double quote at end
+        
+        // Also convert any remaining straight quotes in the middle of the text to curly quotes
+        result = result.replace(/'/g, "\u2019"); // Replace any remaining single quotes with right single quotes
         
         return result;
     }
