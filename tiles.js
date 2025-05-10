@@ -951,6 +951,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         return element;
     }
     
+    // Function to convert straight quotes to curly/smart quotes
+    function convertToSmartQuotes(text) {
+        if (!text) return text;
+        
+        // Use Unicode escape sequences for curly quotes
+        // Left double quote: \u201C
+        // Right double quote: \u201D
+        // Left single quote: \u2018
+        // Right single quote: \u2019
+        
+        // Simple approach - replace all double quotes with right double curly quotes
+        let result = text.replace(/"/g, "\u201D");
+        
+        // Replace all single quotes with right single curly quotes
+        result = result.replace(/'/g, "\u2019");
+        
+        return result;
+    }
+    
     // Handle click on the whisper message
     function handleWhisperClick() {
         // Get the current wood type
@@ -1055,10 +1074,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 // Display the quote in the message area
                 if (data.quote) {
-                    // Apply formatting based on quote length
-                    applyQuoteFormatting(messageArea, data.quote);
+                    // Apply smart quotes to the quote text
+                    const smartQuoteText = convertToSmartQuotes(data.quote);
                     
-                    messageArea.innerHTML = `<span>${data.quote}</span>`;
+                    // Apply formatting based on quote length
+                    applyQuoteFormatting(messageArea, smartQuoteText);
+                    
+                    messageArea.innerHTML = `<span>${smartQuoteText}</span>`;
                     
                     // Remove the standard whisper click handler while showing quote
                     messageArea.removeEventListener('click', handleWhisperClick);
